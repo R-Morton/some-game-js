@@ -1,11 +1,16 @@
-import { createContext, useContext, useReducer, useEffect } from "react"
+import { createContext, useContext, useReducer, useEffect, useState } from "react"
 import { useLocalStorage } from "react-use"
 
 const initialPlayerData = {
         name: "Player",
         level: 1,
-        inventory: []
+        maxHealth: 100,
+        health: null,
+        baseDamage: 10,
+        inventory: [],
+        isPlayer: true
     }
+
 
 const initialNpcData = {}
 
@@ -19,7 +24,6 @@ const playerReducer = (previousState, instructions) => {
             let localStorageData = instructions.data
             stateEditable = localStorageData
             
-            // Whatever is returned is the new state data
             return stateEditable
         
         case "create":
@@ -27,7 +31,9 @@ const playerReducer = (previousState, instructions) => {
 
             
         case "update":
-            break
+            let updatedStats = instructions.data
+            stateEditable = updatedStats
+            return stateEditable
         
         case "delete":
             break
@@ -40,14 +46,13 @@ const playerReducer = (previousState, instructions) => {
 
 export const PlayerDataContext = createContext(null)
 export const PlayerDispatchContext = createContext(null)
-export const NpcDataContext = createContext(initialNpcData)
+export const NpcDataContext = createContext(null)
+export const NpcDispatchContext = createContext(null)
 
-// Custom hook for read only data
 export function usePlayerData() {
     return useContext(PlayerDataContext)
 }
 
-// Custom hook for write/dispatch data
 export function usePlayerDispatch() {
     return useContext(PlayerDispatchContext)
 }
@@ -56,9 +61,15 @@ export function useNpcData() {
     return useContext(NpcDataContext)
 }
 
+export function useNpcDispatch() {
+    return useContext(NpcDispatchContext)
+}
+
 export default function PlayerProvider(props) {
 
+
     const [playerData, playerDispatch] = useReducer(playerReducer, initialPlayerData)
+    const [npcData, npcDispatch] = useReducer(playerReducer, initialNpcData)
 
     const [persistantData, setPersistantData] = useLocalStorage('player', initialPlayerData)
 
@@ -67,26 +78,41 @@ export default function PlayerProvider(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    //Autosaves changes to noted from reducer state into localstorage
     useEffect(() => {
         setPersistantData(playerData)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerData])
+
 
     useEffect(() => {
         for (let key in initialPlayerData) {
             initialNpcData[key] = initialPlayerData[key]
         }
         initialNpcData.name = "Npc"
+        initialNpcData.maxHealth = 110
+        initialNpcData.isPlayer = false
     })
 
+    useEffect(() => {
+        const updatedPlayerStats = {...playerData, health: playerData.maxHealth}
+        playerDispatch({type:"update", data: updatedPlayerStats})
+    }, [])
+
+    useEffect(() => {
+        const updatedNpcStats = {...npcData, health: npcData.maxHealth}
+        npcDispatch({type:"update", data: updatedNpcStats})
+    }, [])
+
+
     return(
-        <NpcDataContext.Provider value={initialNpcData}>
-            <PlayerDataContext.Provider value={playerData}>
-                <PlayerDispatchContext.Provider value={playerDispatch}>
-                    {props.children}
-                </PlayerDispatchContext.Provider>
-            </PlayerDataContext.Provider>
+        <NpcDataContext.Provider value={npcData}>
+            <NpcDispatchContext.Provider value={npcDispatch}>
+                <PlayerDataContext.Provider value={playerData}>
+                    <PlayerDispatchContext.Provider value={playerDispatch}>
+                        {props.children}
+                    </PlayerDispatchContext.Provider>
+                </PlayerDataContext.Provider>
+            </NpcDispatchContext.Provider>
         </NpcDataContext.Provider>
     )
 }
