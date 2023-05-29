@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useEffect, useState } from "react"
 import { useLocalStorage } from "react-use"
 
+// Initial player data declared here. In time, player can choose name, but not yet.
 const initialPlayerData = {
         name: "Player",
         level: 1,
@@ -12,14 +13,15 @@ const initialPlayerData = {
     }
 
 
-const initialNpcData = {}
+const initialNpcData = {...initialPlayerData, name: "NPC", maxHealth: 110, isPlayer: false}
 
 
-
+// Reducer for player and npc for updating stats.
 const playerReducer = (previousState, instructions) => {
     let stateEditable = previousState
 
     switch (instructions.type) {
+        // Sets up local storage saving
         case "setup":
             let localStorageData = instructions.data
             stateEditable = localStorageData
@@ -31,6 +33,7 @@ const playerReducer = (previousState, instructions) => {
 
             
         case "update":
+            // Updated stats passed in and set into global state.
             let updatedStats = instructions.data
             stateEditable = updatedStats
             return stateEditable
@@ -43,34 +46,39 @@ const playerReducer = (previousState, instructions) => {
     }
 }
 
-
+// Contexts created here
 export const PlayerDataContext = createContext(null)
 export const PlayerDispatchContext = createContext(null)
 export const NpcDataContext = createContext(null)
 export const NpcDispatchContext = createContext(null)
 
+// Custom hook for reading player data
 export function usePlayerData() {
     return useContext(PlayerDataContext)
 }
 
+// Custom hook for writing player data
 export function usePlayerDispatch() {
     return useContext(PlayerDispatchContext)
 }
 
+// Custom hook for reading npc data
 export function useNpcData() {
     return useContext(NpcDataContext)
 }
 
+// Customer hook for writing npc data
 export function useNpcDispatch() {
     return useContext(NpcDispatchContext)
 }
 
 export default function PlayerProvider(props) {
 
-
+    // Initialising reducers
     const [playerData, playerDispatch] = useReducer(playerReducer, initialPlayerData)
     const [npcData, npcDispatch] = useReducer(playerReducer, initialNpcData)
 
+    // Persistant data saved here before being saved to Local Storage
     const [persistantData, setPersistantData] = useLocalStorage('player', initialPlayerData)
 
     useEffect(() => {
@@ -84,20 +92,15 @@ export default function PlayerProvider(props) {
     }, [playerData])
 
 
-    useEffect(() => {
-        for (let key in initialPlayerData) {
-            initialNpcData[key] = initialPlayerData[key]
-        }
-        initialNpcData.name = "Npc"
-        initialNpcData.maxHealth = 110
-        initialNpcData.isPlayer = false
-    })
 
+    // Currently updates the health stat to match the max health
     useEffect(() => {
         const updatedPlayerStats = {...playerData, health: playerData.maxHealth}
         playerDispatch({type:"update", data: updatedPlayerStats})
     }, [])
 
+
+    // Does the same as above but for the npc data
     useEffect(() => {
         const updatedNpcStats = {...npcData, health: npcData.maxHealth}
         npcDispatch({type:"update", data: updatedNpcStats})
