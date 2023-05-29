@@ -1,17 +1,18 @@
 import { createContext, useContext, useReducer, useEffect } from "react"
 import { useLocalStorage } from "react-use"
 
-const initialPlayerData = [
-    {
-        id: 1,
-        name: "",
+const initialPlayerData = {
+        name: "Player",
         level: 1,
         inventory: []
     }
-]
+
+const initialNpcData = {}
+
+
 
 const playerReducer = (previousState, instructions) => {
-    let stateEditable = [...previousState]
+    let stateEditable = previousState
 
     switch (instructions.type) {
         case "setup":
@@ -39,15 +40,20 @@ const playerReducer = (previousState, instructions) => {
 
 export const PlayerDataContext = createContext(null)
 export const PlayerDispatchContext = createContext(null)
+export const NpcDataContext = createContext(initialNpcData)
 
 // Custom hook for read only data
-export function usePlayerContext() {
+export function usePlayerData() {
     return useContext(PlayerDataContext)
 }
 
 // Custom hook for write/dispatch data
 export function usePlayerDispatch() {
     return useContext(PlayerDispatchContext)
+}
+
+export function useNpcData() {
+    return useContext(NpcDataContext)
 }
 
 export default function PlayerProvider(props) {
@@ -67,11 +73,20 @@ export default function PlayerProvider(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playerData])
 
+    useEffect(() => {
+        for (let key in initialPlayerData) {
+            initialNpcData[key] = initialPlayerData[key]
+        }
+        initialNpcData.name = "Npc"
+    })
+
     return(
-        <PlayerDataContext.Provider value={playerData}>
-            <PlayerDispatchContext.Provider value={playerDispatch}>
-                {props.children}
-            </PlayerDispatchContext.Provider>
-        </PlayerDataContext.Provider>
+        <NpcDataContext.Provider value={initialNpcData}>
+            <PlayerDataContext.Provider value={playerData}>
+                <PlayerDispatchContext.Provider value={playerDispatch}>
+                    {props.children}
+                </PlayerDispatchContext.Provider>
+            </PlayerDataContext.Provider>
+        </NpcDataContext.Provider>
     )
 }
