@@ -15,38 +15,31 @@ export default function Fight() {
     const npcDispatch = useNpcDispatch()
     const npcData = useNpcData()
 
+    const [dodged, setDodged] = useState(false)
+    const [crit, setCrit] = useState(false)
+    const [block, setBlock] = useState(false)
+
     // Set local player state using the global player data access
     useEffect(() => {
         setLocalPlayer(playerData)
     }, [playerData])
 
-    // Consoling local player for developer checking
-    useEffect(() => {
-        console.log(localPlayer);
-      }, [localPlayer]);
-    
     // Similar process as above but with npc data
     useEffect(() => {
         setLocalNpc(npcData)
     }, [npcData])
 
-    useEffect(() => {
-        console.log(localNpc)
-    }, [localNpc])
-
 
     function handlePlayerAttack() {
         // When attack button is pressed, this is triggered
         // First setting the state to allow the player attacking render to show while triggering the attack function.
-        setAttackVisible(true)
         attack(localNpc, localPlayer)
+        setAttackVisible(true)
 
         const timer = setTimeout(() => {
             // After three seconds this function is displayed.
             handleAttackDisplay()
         }, 3000)
-
-        return () => clearTimeout(timer)
     }
 
     const handleAttackDisplay = () => {
@@ -57,8 +50,6 @@ export default function Fight() {
             setAttackVisible(true)
             handleNpcAttack()
         }, 1000)
-
-        return () => clearTimeout(timer)
     }
 
     function handleNpcAttack() {
@@ -69,11 +60,22 @@ export default function Fight() {
             // After 3 seconds, visibilty set to false again.
             setAttackVisible(false)
         }, 3000)
+    }
 
-        return () => clearTimeout(timer)
+    function dodgeChance(defender) {
+        const random = Math.random() * 100
+        if (random < defender.dodgeChance) {
+            setDodged(true)
+            setTimeout(() => {
+                setDodged(false)
+            }, 3000)
+            return true
+        }
+        return false
     }
 
     function attack(defender, attacker) {
+        console.log(defender)
         // declaring damage of attacker as variable
         let damage = attacker.baseDamage
 
@@ -82,19 +84,29 @@ export default function Fight() {
 
         // reducing defender health by attacker damage
         defenderStats.health -= damage
-        defenderStats.levelExp += 10
+
+        if (defender.isPlayer) {
+            setAttacker(localNpc)
+            setDefender(localPlayer)
+        
+        } 
+        if(attacker.isPlayer) {
+            setAttacker(localPlayer)
+            setDefender(localNpc)
+        }
+
+        if (dodgeChance(defender)) {
+            return 
+        }
 
         // If defender is player, update state of npc and set attack/defender state
         if (defender.isPlayer) {
             playerDispatch({type:"update", data: defenderStats})
-            setAttacker(localNpc)
-            setDefender(localPlayer)
         
         // Else do opposite
         } else if(attacker.isPlayer) {
             npcDispatch({type:"update", data: defenderStats})
-            setAttacker(localPlayer)
-            setDefender(localNpc)
+
         }
     }
 
@@ -116,9 +128,16 @@ export default function Fight() {
 
             </div>
             <div>
-                {attackVisible && 
+                {attackVisible && !dodged &&
                     <div>
                         <p>{attacker.name} did {attacker.baseDamage} to {defender.name}</p>
+                    </div>
+                }
+            </div>
+            <div>
+                {dodged && 
+                    <div>
+                        <p>{defender.name} dodged due to {defender.dodgeChance}% dodge chance</p>
                     </div>
                 }
             </div>

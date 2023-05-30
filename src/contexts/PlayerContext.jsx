@@ -3,6 +3,7 @@ import { useLocalStorage } from "react-use"
 
 // Initial player data declared here. In time, player can choose name, but not yet.
 const initialPlayerData = {
+        isInitialData: true,
         name: "Player",
         level: 1,
         levelExp: 0,
@@ -62,7 +63,6 @@ const playerReducer = (previousState, instructions) => {
             stateEditable = tempStats
             console.log(stateEditable)
             return stateEditable
-        
         case "delete":
             break
         default:
@@ -99,11 +99,12 @@ export function useNpcDispatch() {
 
 export default function PlayerProvider(props) {
 
+    const [persistantData, setPersistantData] = useLocalStorage('player', initialPlayerData)
+
     // Initialising reducers
-    const [playerData, playerDispatch] = useReducer(playerReducer, initialPlayerData)
+    const [playerData, playerDispatch] = useReducer(playerReducer, persistantData || initialPlayerData)
     const [npcData, npcDispatch] = useReducer(playerReducer, initialNpcData)
 
-    const [persistantData, setPersistantData] = useLocalStorage('player', initialPlayerData)
 
     useEffect(() => {
         playerDispatch({type:"setup", data: persistantData})
@@ -120,16 +121,14 @@ export default function PlayerProvider(props) {
     // Currently updates the health stat to match the max health
     useEffect(() => {
         const updatedPlayerStats = {...playerData}
-            updatedPlayerStats.maxHealth = 100 + (playerData.endurance * 10)
+            updatedPlayerStats.maxHealth = 100 + (updatedPlayerStats.endurance * 10)
             updatedPlayerStats.health = updatedPlayerStats.maxHealth
             updatedPlayerStats.maxStam = 100 + (updatedPlayerStats.agility * 5)
             updatedPlayerStats.stamina = updatedPlayerStats.maxStam
             updatedPlayerStats.damage = 5 + (updatedPlayerStats.strength)
             updatedPlayerStats.critChance = 5 + (updatedPlayerStats.luck * 2)
             updatedPlayerStats.blockChance = 10 + (updatedPlayerStats.endurance * 3)
-            updatedPlayerStats. dodgeChance = 5 + (updatedPlayerStats.agility * 3)
-            
-        
+            updatedPlayerStats.dodgeChance = 50 + (updatedPlayerStats.agility * 3)
         playerDispatch({type:"update", data: updatedPlayerStats})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -137,7 +136,15 @@ export default function PlayerProvider(props) {
 
     // Does the same as above but for the npc data
     useEffect(() => {
-        const updatedNpcStats = {...npcData, health: npcData.maxHealth}
+        const updatedNpcStats = {...npcData}
+        updatedNpcStats.maxHealth = 100 + (updatedNpcStats.endurance * 10)
+        updatedNpcStats.health = updatedNpcStats.maxHealth
+        updatedNpcStats.maxStam = 100 + (updatedNpcStats.agility * 5)
+        updatedNpcStats.stamina = updatedNpcStats.maxStam
+        updatedNpcStats.damage = 5 + (updatedNpcStats.strength)
+        updatedNpcStats.critChance = 5 + (updatedNpcStats.luck * 2)
+        updatedNpcStats.blockChance = 10 + (updatedNpcStats.endurance * 3)
+        updatedNpcStats.dodgeChance = 100 + (updatedNpcStats.agility * 3)
         npcDispatch({type:"update", data: updatedNpcStats})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])

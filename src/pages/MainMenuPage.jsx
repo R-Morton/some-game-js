@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import Fight from "../components/Fight"
-import { usePlayerData, usePlayerDispatch } from "../contexts/PlayerContext"
+import { useNpcData, usePlayerData, usePlayerDispatch } from "../contexts/PlayerContext"
 
 export default function MainMenuPage() {
 
@@ -9,6 +9,7 @@ export default function MainMenuPage() {
 
     const playerDispatch = usePlayerDispatch();
     const playerData = usePlayerData();
+    const npcData = useNpcData()
 
     function handleToggleFight() {
         setToggleFight(!toggleFight)
@@ -24,7 +25,7 @@ export default function MainMenuPage() {
             setToggle(false)
         }, 2000)
         return () => clearTimeout(timer)
-    }, [playerData.level])
+    }, [playerData.level]) 
 
 
 
