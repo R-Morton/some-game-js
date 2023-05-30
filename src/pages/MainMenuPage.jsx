@@ -1,20 +1,32 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Fight from "../components/Fight"
-import GeneralLeveling from "../components/Leveling"
-import Leveling from "../components/Leveling"
+import { usePlayerData, usePlayerDispatch } from "../contexts/PlayerContext"
 
 export default function MainMenuPage() {
 
     const [toggleFight, setToggleFight] = useState(false)
     const [toggle, setToggle] = useState(false)
 
+    const playerDispatch = usePlayerDispatch();
+    const playerData = usePlayerData();
+
     function handleToggleFight() {
         setToggleFight(!toggleFight)
     }
 
     function handleLeveling() {
-        setToggle(!toggle)
+        playerDispatch({type:"addGeneralExp", data:30})
     }
+
+    useEffect(() => {
+        setToggle(true)
+        const timer = setTimeout(() => {
+            setToggle(false)
+        }, 2000)
+        return () => clearTimeout(timer)
+    }, [playerData.level])
+
+
 
     return(
         <div>
@@ -22,8 +34,11 @@ export default function MainMenuPage() {
             <button onClick={handleToggleFight}>Fight!</button>
             {toggleFight && <Fight />}
             <button onClick={handleLeveling}>Increase Level Exp</button>
-            {toggle && <Leveling />}
-            
+            {toggle && 
+                <div>
+                    <p>You are now level {playerData.level}</p>
+                </div>
+            }
         </div>
     )
 }

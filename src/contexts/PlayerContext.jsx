@@ -11,8 +11,14 @@ const initialPlayerData = {
         agility: 1,
         luck: 1,
         endurance: 1,
-        maxHealth: 100,
+        maxHealth: null,
         health: null,
+        maxStam: null,
+        stamina: null,
+        damage: null,
+        dodgeChance: null,
+        blockChance: null,
+        critChance: null,
         baseDamage: 10,
         inventory: [],
         isPlayer: true
@@ -24,7 +30,7 @@ const initialNpcData = {...initialPlayerData, name: "NPC", maxHealth: 110, isPla
 
 // Reducer for player and npc for updating stats.
 const playerReducer = (previousState, instructions) => {
-    let stateEditable = previousState
+    let stateEditable = {...previousState}
 
     switch (instructions.type) {
         // Sets up local storage saving
@@ -42,6 +48,19 @@ const playerReducer = (previousState, instructions) => {
             // Updated stats passed in and set into global state.
             let updatedStats = instructions.data
             stateEditable = updatedStats
+            return stateEditable
+        
+        case "addGeneralExp":
+            let tempStats = stateEditable
+            tempStats.levelExp += instructions.data
+
+            if (tempStats.levelExp >= tempStats.levelExpMax){
+                tempStats.level += 1
+                tempStats.levelExp = 0 + (tempStats.levelExp - tempStats.levelExpMax)
+            }
+
+            stateEditable = tempStats
+            console.log(stateEditable)
             return stateEditable
         
         case "delete":
@@ -84,7 +103,6 @@ export default function PlayerProvider(props) {
     const [playerData, playerDispatch] = useReducer(playerReducer, initialPlayerData)
     const [npcData, npcDispatch] = useReducer(playerReducer, initialNpcData)
 
-    // Persistant data saved here before being saved to Local Storage
     const [persistantData, setPersistantData] = useLocalStorage('player', initialPlayerData)
 
     useEffect(() => {
@@ -101,7 +119,17 @@ export default function PlayerProvider(props) {
 
     // Currently updates the health stat to match the max health
     useEffect(() => {
-        const updatedPlayerStats = {...playerData, health: playerData.maxHealth}
+        const updatedPlayerStats = {...playerData}
+            updatedPlayerStats.maxHealth = 100 + (playerData.endurance * 10)
+            updatedPlayerStats.health = updatedPlayerStats.maxHealth
+            updatedPlayerStats.maxStam = 100 + (updatedPlayerStats.agility * 5)
+            updatedPlayerStats.stamina = updatedPlayerStats.maxStam
+            updatedPlayerStats.damage = 5 + (updatedPlayerStats.strength)
+            updatedPlayerStats.critChance = 5 + (updatedPlayerStats.luck * 2)
+            updatedPlayerStats.blockChance = 10 + (updatedPlayerStats.endurance * 3)
+            updatedPlayerStats. dodgeChance = 5 + (updatedPlayerStats.agility * 3)
+            
+        
         playerDispatch({type:"update", data: updatedPlayerStats})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
