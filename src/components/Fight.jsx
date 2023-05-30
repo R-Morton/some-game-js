@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from "react";
-import { usePlayerData, NpcDataContext, useNpcData, NpcDispatchContext, useNpcDispatch, usePlayerDispatch } from "../contexts/PlayerContext";
+import { useEffect, useState } from "react";
+import { usePlayerData, useNpcData, useNpcDispatch, usePlayerDispatch } from "../contexts/PlayerContext";
 
 export default function Fight() {
 
@@ -82,6 +82,7 @@ export default function Fight() {
 
         // reducing defender health by attacker damage
         defenderStats.health -= damage
+        defenderStats.levelExp += 10
 
         // If defender is player, update state of npc and set attack/defender state
         if (defender.isPlayer) {

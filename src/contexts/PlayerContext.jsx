@@ -1,10 +1,16 @@
-import { createContext, useContext, useReducer, useEffect, useState } from "react"
+import { createContext, useContext, useReducer, useEffect } from "react"
 import { useLocalStorage } from "react-use"
 
 // Initial player data declared here. In time, player can choose name, but not yet.
 const initialPlayerData = {
         name: "Player",
         level: 1,
+        levelExp: 0,
+        levelExpMax: 100,
+        strength: 1,
+        agility: 1,
+        luck: 1,
+        endurance: 1,
         maxHealth: 100,
         health: null,
         baseDamage: 10,
@@ -97,6 +103,7 @@ export default function PlayerProvider(props) {
     useEffect(() => {
         const updatedPlayerStats = {...playerData, health: playerData.maxHealth}
         playerDispatch({type:"update", data: updatedPlayerStats})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
@@ -104,6 +111,7 @@ export default function PlayerProvider(props) {
     useEffect(() => {
         const updatedNpcStats = {...npcData, health: npcData.maxHealth}
         npcDispatch({type:"update", data: updatedNpcStats})
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
