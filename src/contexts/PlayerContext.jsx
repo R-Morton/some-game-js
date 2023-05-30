@@ -127,14 +127,15 @@ export default function PlayerProvider(props) {
             updatedPlayerStats.stamina = updatedPlayerStats.maxStam
             updatedPlayerStats.damage = 5 + (updatedPlayerStats.strength)
             updatedPlayerStats.critChance = 5 + (updatedPlayerStats.luck * 2)
-            updatedPlayerStats.blockChance = 10 + (updatedPlayerStats.endurance * 3)
-            updatedPlayerStats.dodgeChance = 50 + (updatedPlayerStats.agility * 3)
+            updatedPlayerStats.blockChance = 50 + (updatedPlayerStats.endurance * 3)
+            updatedPlayerStats.dodgeChance = 5 + (updatedPlayerStats.agility * 3)
         playerDispatch({type:"update", data: updatedPlayerStats})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
 
     // Does the same as above but for the npc data
+    // Lets make this more DRY down the track
     useEffect(() => {
         const updatedNpcStats = {...npcData}
         updatedNpcStats.maxHealth = 100 + (updatedNpcStats.endurance * 10)
@@ -143,8 +144,8 @@ export default function PlayerProvider(props) {
         updatedNpcStats.stamina = updatedNpcStats.maxStam
         updatedNpcStats.damage = 5 + (updatedNpcStats.strength)
         updatedNpcStats.critChance = 5 + (updatedNpcStats.luck * 2)
-        updatedNpcStats.blockChance = 10 + (updatedNpcStats.endurance * 3)
-        updatedNpcStats.dodgeChance = 100 + (updatedNpcStats.agility * 3)
+        updatedNpcStats.blockChance = 50 + (updatedNpcStats.endurance * 3)
+        updatedNpcStats.dodgeChance = 5 + (updatedNpcStats.agility * 3)
         npcDispatch({type:"update", data: updatedNpcStats})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])

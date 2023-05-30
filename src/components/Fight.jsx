@@ -36,7 +36,7 @@ export default function Fight() {
         attack(localNpc, localPlayer)
         setAttackVisible(true)
 
-        const timer = setTimeout(() => {
+        setTimeout(() => {
             // After three seconds this function is displayed.
             handleAttackDisplay()
         }, 3000)
@@ -45,7 +45,7 @@ export default function Fight() {
     const handleAttackDisplay = () => {
         // Immediately the visibilty is set to false to break between attacks.
         setAttackVisible(false)
-        const timer = setTimeout(() => {
+        setTimeout(() => {
             // After one second the npc attack is triggered also setting visibility to true again.
             setAttackVisible(true)
             handleNpcAttack()
@@ -56,14 +56,17 @@ export default function Fight() {
         // Npc attack triggered
         attack(localPlayer, localNpc)
 
-        const timer = setTimeout(() => {
+        setTimeout(() => {
             // After 3 seconds, visibilty set to false again.
             setAttackVisible(false)
         }, 3000)
     }
 
+    // function to determine if defender dodges attack
     function dodgeChance(defender) {
+        // generate number between 0 and 100
         const random = Math.random() * 100
+        // check if random number is within defender dodge chance
         if (random < defender.dodgeChance) {
             setDodged(true)
             setTimeout(() => {
@@ -71,8 +74,37 @@ export default function Fight() {
             }, 3000)
             return true
         }
+        // If number is higher than dodge chance, return false
         return false
     }
+
+    function critChance(attacker) {
+        const random = Math.random() * 100
+        //check if random number is within attacker crit chance
+        if (random < attacker.critChance) {
+            setCrit(true)
+            setTimeout(() => {
+                setCrit(false)
+            }, 3000)
+            return true
+        }
+        return false
+    }
+
+    function blockChance(defender) {
+        const random = Math.random() * 100
+        //check if random number is within defender block chance
+        if (random < defender.blockChance) {
+            setBlock(true)
+            setTimeout(() => {
+                setBlock(false)
+            }, 3000)
+            return true
+        }
+        return false
+    }
+    
+
 
     function attack(defender, attacker) {
         console.log(defender)
@@ -82,22 +114,33 @@ export default function Fight() {
         // Declaring variable of defender stats
         let defenderStats = {...defender}
 
-        // reducing defender health by attacker damage
-        defenderStats.health -= damage
-
+        // setting local state of defender and attacker
         if (defender.isPlayer) {
             setAttacker(localNpc)
             setDefender(localPlayer)
-        
         } 
+
+        // setting local state of defender and attacker
         if(attacker.isPlayer) {
             setAttacker(localPlayer)
             setDefender(localNpc)
         }
 
+        // if dodge chance returns false, this will be run the rest of the function, else it will be returned
         if (dodgeChance(defender)) {
             return 
         }
+
+        if (critChance(attacker)) {
+            damage *= 2
+        }
+
+        if (blockChance(defender)) {
+            return
+        }
+
+        // reducing defender health by attacker damage
+        defenderStats.health -= damage
 
         // If defender is player, update state of npc and set attack/defender state
         if (defender.isPlayer) {
@@ -127,20 +170,26 @@ export default function Fight() {
                 <button onClick={handlePlayerAttack}>Player Attack</button>
 
             </div>
-            <div>
-                {attackVisible && !dodged &&
-                    <div>
-                        <p>{attacker.name} did {attacker.baseDamage} to {defender.name}</p>
-                    </div>
+            {attackVisible && !dodged && !crit && !block &&
+                <div>
+                    <p>{attacker.name} did {attacker.baseDamage} to {defender.name}</p>
+                </div>
                 }
-            </div>
-            <div>
                 {dodged && 
                     <div>
                         <p>{defender.name} dodged due to {defender.dodgeChance}% dodge chance</p>
                     </div>
                 }
-            </div>
+            {block &&
+                <div>
+                    <p>{defender.name} blocked due to {defender.blockChance}% to block chance</p>
+                </div>
+            }
+            {crit && 
+                <div> 
+                    <p>{attacker.name} crit hit due to their {attacker.critChance}% critical hit chance</p>
+                </div>
+            }
         </div>
     )
 }
