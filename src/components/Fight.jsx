@@ -1,11 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { usePlayerData, useNpcData, useNpcDispatch, usePlayerDispatch } from "../contexts/PlayerContext";
 
 export default function Fight() {
 
-    
-    const [localPlayer, setLocalPlayer] = useState({})
-    const [localNpc, setLocalNpc] = useState({})
     const [attackVisible, setAttackVisible] = useState(false)
     const [attacker, setAttacker] = useState()
     const [defender, setDefender] = useState()
@@ -19,21 +16,11 @@ export default function Fight() {
     const [crit, setCrit] = useState(false)
     const [block, setBlock] = useState(false)
 
-    // Set local player state using the global player data access
-    useEffect(() => {
-        setLocalPlayer(playerData)
-    }, [playerData])
-
-    // Similar process as above but with npc data
-    useEffect(() => {
-        setLocalNpc(npcData)
-    }, [npcData])
-
 
     function handlePlayerAttack() {
         // When attack button is pressed, this is triggered
         // First setting the state to allow the player attacking render to show while triggering the attack function.
-        attack(localNpc, localPlayer)
+        attack(npcData, playerData)
         setAttackVisible(true)
 
         setTimeout(() => {
@@ -54,7 +41,7 @@ export default function Fight() {
 
     function handleNpcAttack() {
         // Npc attack triggered
-        attack(localPlayer, localNpc)
+        attack(playerData, npcData)
 
         setTimeout(() => {
             // After 3 seconds, visibilty set to false again.
@@ -106,24 +93,27 @@ export default function Fight() {
     
 
 
-    function attack(defender, attacker) {
+    function attack(defender, attacker, type) {
         console.log(defender)
         // declaring damage of attacker as variable
         let damage = attacker.baseDamage
+        let stamina = 10
 
         // Declaring variable of defender stats
         let defenderStats = {...defender}
+        let attackerStats = {...attacker}
+        attackerStats.stamina -= stamina
 
         // setting local state of defender and attacker
         if (defender.isPlayer) {
-            setAttacker(localNpc)
-            setDefender(localPlayer)
+            setAttacker(npcData)
+            setDefender(playerData)
         } 
 
         // setting local state of defender and attacker
         if(attacker.isPlayer) {
-            setAttacker(localPlayer)
-            setDefender(localNpc)
+            setAttacker(playerData)
+            setDefender(npcData)
         }
 
         // if dodge chance returns false, this will be run the rest of the function, else it will be returned
@@ -145,12 +135,15 @@ export default function Fight() {
         // If defender is player, update state of npc and set attack/defender state
         if (defender.isPlayer) {
             playerDispatch({type:"update", data: defenderStats})
+            npcDispatch({type:"update", data: attackerStats})
         
         // Else do opposite
-        } else if(attacker.isPlayer) {
+        } if(attacker.isPlayer) {
             npcDispatch({type:"update", data: defenderStats})
-
+            playerDispatch({type:"update", data: attackerStats})
         }
+
+        return
     }
 
     return(
@@ -158,13 +151,15 @@ export default function Fight() {
             <h1>Fight Page</h1>
             <div>
                 <h3>Player Stats</h3>
-                <p>{localPlayer.name}</p>
-                <p>{localPlayer.health}</p>
+                <p>{playerData.name}</p>
+                <p>Health: {playerData.health}</p>
+                <p>Stamina: {playerData.stamina}</p>
             </div>
             <div>
                 <h3>Npc Stats</h3>
-                <p>{localNpc.name}</p>
-                <p>{localNpc.health}</p>
+                <p>{npcData.name}</p>
+                <p>Health: {npcData.health}</p>
+                <p>Stamina: {npcData.stamina}</p>
             </div>
             <div>
                 <button onClick={handlePlayerAttack}>Player Attack</button>
