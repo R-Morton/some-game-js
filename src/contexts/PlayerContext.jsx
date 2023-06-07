@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from "react"
 import { useLocalStorage } from "react-use"
+import { playerReducer } from "../reducers/characterReducer"
 
 // Initial player data declared here. In time, player can choose name, but not yet.
 const initialPlayerData = {
@@ -29,47 +30,8 @@ const initialPlayerData = {
 const initialNpcData = {...initialPlayerData, name: "NPC", maxHealth: 110, isPlayer: false}
 
 
-// Reducer for player and npc for updating stats.
-const playerReducer = (previousState, instructions) => {
-    let stateEditable = {...previousState}
 
-    switch (instructions.type) {
-        // Sets up local storage saving
-        case "setup":
-            let localStorageData = instructions.data
-            stateEditable = localStorageData
-            
-            return stateEditable
-        
-        case "create":
-            break    
 
-            
-        case "update":
-            // Updated stats passed in and set into global state.
-            let updatedStats = instructions.data
-            stateEditable = updatedStats
-            return stateEditable
-        
-        case "addGeneralExp":
-            let tempStats = stateEditable
-            tempStats.levelExp += instructions.data
-
-            if (tempStats.levelExp >= tempStats.levelExpMax){
-                tempStats.level += 1
-                tempStats.levelExp = 0 + (tempStats.levelExp - tempStats.levelExpMax)
-            }
-
-            stateEditable = tempStats
-            console.log(stateEditable)
-            return stateEditable
-        case "delete":
-            break
-        default:
-            console.log("Invalid instruction")
-
-    }
-}
 
 // Contexts created here
 export const PlayerDataContext = createContext(null)

@@ -92,17 +92,12 @@ export default function Fight() {
     }
     
 
-
-    function attack(defender, attacker, type) {
+    function attack(defenderDispatch, attackerDispatch, type) {
         console.log(defender)
         // declaring damage of attacker as variable
         let damage = attacker.baseDamage
         let stamina = 10
 
-        // Declaring variable of defender stats
-        let defenderStats = {...defender}
-        let attackerStats = {...attacker}
-        attackerStats.stamina -= stamina
 
         // setting local state of defender and attacker
         if (defender.isPlayer) {
@@ -117,31 +112,18 @@ export default function Fight() {
         }
 
         // if dodge chance returns false, this will be run the rest of the function, else it will be returned
-        if (dodgeChance(defender)) {
+        /*if (dodgeChance(defender)) {
             return 
-        }
+        }*/
 
         if (critChance(attacker)) {
             damage *= 2
         }
 
-        if (blockChance(defender)) {
-            return
-        }
+        defenderDispatch({type:"receiveDamage", amount: damage})
+        attackerDispatch({type:"spendStamina", amount: stamina})
 
-        // reducing defender health by attacker damage
-        defenderStats.health -= damage
-
-        // If defender is player, update state of npc and set attack/defender state
-        if (defender.isPlayer) {
-            playerDispatch({type:"update", data: defenderStats})
-            npcDispatch({type:"update", data: attackerStats})
-        
-        // Else do opposite
-        } if(attacker.isPlayer) {
-            npcDispatch({type:"update", data: defenderStats})
-            playerDispatch({type:"update", data: attackerStats})
-        }
+    
 
         return
     }
