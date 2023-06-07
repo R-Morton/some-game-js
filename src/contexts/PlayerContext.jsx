@@ -4,6 +4,15 @@ import { playerReducer } from "../reducers/characterReducer"
 
 // Initial player data declared here. In time, player can choose name, but not yet.
 const initialPlayerData = {
+        armour: {
+            chest: null,
+            legs: null,
+            feet: null,
+            hands: null,
+            head: null,
+            shield: null,
+        },
+        weapon: null,
         isInitialData: true,
         name: "Player",
         level: 1,
@@ -27,7 +36,7 @@ const initialPlayerData = {
     }
 
 
-const initialNpcData = {...initialPlayerData, name: "NPC", maxHealth: 110, isPlayer: false}
+const initialNpcData = {...initialPlayerData, name: "NPC", isPlayer: false}
 
 
 

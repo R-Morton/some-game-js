@@ -20,7 +20,7 @@ export default function Fight() {
     function handlePlayerAttack() {
         // When attack button is pressed, this is triggered
         // First setting the state to allow the player attacking render to show while triggering the attack function.
-        attack(npcData, playerData)
+        attack(npcDispatch, npcData, playerDispatch, playerData)
         setAttackVisible(true)
 
         setTimeout(() => {
@@ -41,7 +41,7 @@ export default function Fight() {
 
     function handleNpcAttack() {
         // Npc attack triggered
-        attack(playerData, npcData)
+        attack(playerDispatch, playerData, npcDispatch, npcData)
 
         setTimeout(() => {
             // After 3 seconds, visibilty set to false again.
@@ -92,35 +92,35 @@ export default function Fight() {
     }
     
 
-    function attack(defenderDispatch, attackerDispatch, type) {
-        console.log(defender)
+    function attack(defenderDispatch, defenderData, attackerDispatch, attackerData) {
         // declaring damage of attacker as variable
-        let damage = attacker.baseDamage
+        let damage = attackerData.baseDamage
         let stamina = 10
 
 
         // setting local state of defender and attacker
-        if (defender.isPlayer) {
-            setAttacker(npcData)
-            setDefender(playerData)
-        } 
+        setAttacker(attackerData)
+        setDefender(defenderData)
 
-        // setting local state of defender and attacker
-        if(attacker.isPlayer) {
-            setAttacker(playerData)
-            setDefender(npcData)
-        }
 
         // if dodge chance returns false, this will be run the rest of the function, else it will be returned
-        /*if (dodgeChance(defender)) {
+        if (dodgeChance(defenderData)) {
+            attackerDispatch({type:"spendStamina", amount: stamina})
             return 
-        }*/
+        }
 
-        if (critChance(attacker)) {
+        if (blockChance(defenderData)) {
+            attackerDispatch({type:"spendStamina", amount: stamina})
+            return
+        }
+
+
+
+        if (critChance(attackerData)) {
             damage *= 2
         }
 
-        defenderDispatch({type:"receiveDamage", amount: damage})
+        defenderDispatch({type:"damageHealth", amount: damage})
         attackerDispatch({type:"spendStamina", amount: stamina})
 
     
@@ -131,6 +131,8 @@ export default function Fight() {
     return(
         <div>
             <h1>Fight Page</h1>
+            {playerData && npcData &&
+            <div>
             <div>
                 <h3>Player Stats</h3>
                 <p>{playerData.name}</p>
@@ -143,6 +145,8 @@ export default function Fight() {
                 <p>Health: {npcData.health}</p>
                 <p>Stamina: {npcData.stamina}</p>
             </div>
+            </div>
+            }
             <div>
                 <button onClick={handlePlayerAttack}>Player Attack</button>
 

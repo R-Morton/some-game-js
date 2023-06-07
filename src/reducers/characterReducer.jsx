@@ -37,6 +37,10 @@ export const playerReducer = (previousState, instructions) => {
         case "spendStamina":
             stateEditable.stamina -= instructions.amount
             return stateEditable
+        
+        case "damageHealth":
+            stateEditable.health -= instructions.amount
+            return stateEditable
         case "delete":
             break
         default:
