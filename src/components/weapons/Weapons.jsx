@@ -10,5 +10,11 @@ export const ironWeapons = {
         name: "Iron Longsword",
         type: "blade",
         damage: 4
+    },
+
+    mace: {
+        name: "Iron Mace",
+        type: "blunt",
+        damage: 4
     }
 }

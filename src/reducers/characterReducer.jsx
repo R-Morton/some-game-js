@@ -42,8 +42,20 @@ export const playerReducer = (previousState, instructions) => {
             stateEditable.health -= instructions.amount
             return stateEditable
         
-        case "equip":
-            stateEditable.weapon = instructions.data
+        case "equipWeapon":
+            stateEditable.weapon.mainHand = instructions.data
+            return stateEditable
+        
+        case "equipArmour":
+            let armour = instructions.data
+            let armourSlots = stateEditable.armour
+            for (let slot in armourSlots) {
+                if (slot === armour.slot) {
+                    armourSlots[slot] = armour
+                    stateEditable.armour[slot] = armourSlots[slot]
+
+                }
+            }
             return stateEditable
         case "delete":
             break
