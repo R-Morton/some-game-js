@@ -41,6 +41,10 @@ export const playerReducer = (previousState, instructions) => {
         case "damageHealth":
             stateEditable.health -= instructions.amount
             return stateEditable
+        
+        case "equip":
+            stateEditable.weapon = instructions.data
+            return stateEditable
         case "delete":
             break
         default:

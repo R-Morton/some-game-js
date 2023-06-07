@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react"
 import Fight from "../components/Fight"
-import { useNpcData, usePlayerData, usePlayerDispatch } from "../contexts/PlayerContext"
+import { usePlayerData, usePlayerDispatch } from "../contexts/PlayerContext"
+import Inventory from "./Inventory"
 
 export default function MainMenuPage() {
 
     const [toggleFight, setToggleFight] = useState(false)
     const [toggle, setToggle] = useState(false)
+    const [toggleInventory, setToggleInventory] = useState(false)
 
     const playerDispatch = usePlayerDispatch();
     const playerData = usePlayerData();
-    const npcData = useNpcData()
 
     function handleToggleFight() {
         setToggleFight(!toggleFight)
@@ -17,6 +18,10 @@ export default function MainMenuPage() {
 
     function handleLeveling() {
         playerDispatch({type:"addGeneralExp", data:30})
+    }
+
+    function handleInventory() {
+        setToggleInventory(!toggleInventory)
     }
 
     useEffect(() => {
@@ -35,11 +40,13 @@ export default function MainMenuPage() {
             <button onClick={handleToggleFight}>Fight!</button>
             {toggleFight && <Fight />}
             <button onClick={handleLeveling}>Increase Level Exp</button>
+            <button onClick={handleInventory}>Inventory</button>
             {toggle && 
                 <div>
                     <p>You are now level {playerData.level}</p>
                 </div>
             }
+            {toggleInventory && <Inventory />}
         </div>
     )
 }
