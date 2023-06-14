@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePlayerData, useNpcData, useNpcDispatch, usePlayerDispatch } from "../contexts/PlayerContext";
 
 export default function Fight() {
@@ -27,13 +27,14 @@ export default function Fight() {
             setStance('normal stance')
             setTimeout(() => {
                 setStance(false)
-                handleNpcAttack()
+                playerDispatch({type:"modifyStamina", amount: 30, modifier: "plus"})
+                handleNpcAttack("normal")
             }, 3000)
         } else if (type === 'hStance') {
             setStance('heavy stance')
-            playerDispatch({type:"modifyBlock", modifier:"plus"})
             setTimeout(() => {
                 setStance(false)
+                playerDispatch({type:"modifyStamina", amount: 15, modifier: "plus"})
                 console.log(playerData.blockChance)
                 handleNpcAttack("heavy")
             }, 3000)
@@ -53,11 +54,11 @@ export default function Fight() {
         setAttackVisible(false)
         setTimeout(() => {
             setAttackVisible(true)
-            attack(playerDispatch, playerData, npcDispatch, npcData, "light")
+            console.log(playerData)
+            attack(playerDispatch, playerData, npcDispatch, npcData, "light", stance)
 
             setTimeout(() => {
                 if (stance === 'heavy') {
-                    playerDispatch({type:"modifyBlock", modifier:"minus"})
                 }
                 setAttackVisible(false)
             }, 3000)
@@ -66,9 +67,13 @@ export default function Fight() {
     }
 
     // function to determine if defender dodges attack
-    function dodgeChance(defender) {
+    function dodgeChance(defender, stance) {
         // generate number between 0 and 100
         const random = Math.random() * 100
+        let dodgeChance = defender.dodgeChance
+        if (stance === 'normal') {
+            dodgeChance += 10
+        }
         // check if random number is within defender dodge chance
         if (random < defender.dodgeChance) {
             setDodged(true)
@@ -94,11 +99,16 @@ export default function Fight() {
         return false
     }
 
-    function blockChance(defender) {
+    function blockChance(defender, stance) {
         const random = Math.random() * 100
-        console.log(`${random}/${defender.blockChance}`)
+        let blockChance = defender.blockChance
+        if (stance === 'heavy') {
+            blockChance =+ 30
+        }
+        console.log(stance)
+        console.log(`${random}/${blockChance}`)
         //check if random number is within defender block chance
-        if (random < defender.blockChance) {
+        if (random < blockChance) {
             setBlock(true)
             setTimeout(() => {
                 setBlock(false)
@@ -109,7 +119,7 @@ export default function Fight() {
     }
     
 
-    function attack(defenderDispatch, defenderData, attackerDispatch, attackerData, type) {
+    function attack(defenderDispatch, defenderData, attackerDispatch, attackerData, type, stance) {
         // declaring damage of attacker as variable
         let damage = attackerData.baseDamage
         let stamina = 10
@@ -126,13 +136,13 @@ export default function Fight() {
 
 
         // if dodge chance returns false, this will be run the rest of the function, else it will be returned
-        if (dodgeChance(defenderData)) {
-            attackerDispatch({type:"spendStamina", amount: stamina})
+        if (dodgeChance(defenderData, stance)) {
+            attackerDispatch({type:"modifyStamina", amount: stamina, modifier: "minus"})
             return 
         }
 
-        if (blockChance(defenderData)) {
-            attackerDispatch({type:"spendStamina", amount: stamina})
+        if (blockChance(defenderData, stance)) {
+            attackerDispatch({type:"modifyStamina", amount: stamina, modifier: "minus"})
             return
         }
 
@@ -146,7 +156,7 @@ export default function Fight() {
 
 
         defenderDispatch({type:"damageHealth", amount: damage})
-        attackerDispatch({type:"spendStamina", amount: stamina})
+        attackerDispatch({type:"modifyStamina", amount: stamina, modifier: 'minus'})
 
     
 
@@ -186,12 +196,12 @@ export default function Fight() {
                 }
                 {dodged && 
                     <div>
-                        <p>{defender.name} dodged due to {defender.dodgeChance}% dodge chance</p>
+                        <p>{defender.name} dodged!</p>
                     </div>
                 }
             {block &&
                 <div>
-                    <p>{defender.name} blocked due to {defender.blockChance}% to block chance</p>
+                    <p>{defender.name} blocked!</p>
                 </div>
             }
             {crit && 

@@ -34,8 +34,13 @@ export const playerReducer = (previousState, instructions) => {
             console.log(stateEditable)
             return stateEditable
         
-        case "spendStamina":
-            stateEditable.stamina -= instructions.amount
+        case "modifyStamina":
+            if (instructions.modifier === 'minus'){
+                stateEditable.stamina -= instructions.amount
+            } else if (instructions.modifier === 'plus') {
+                stateEditable.stamina += instructions.amount
+                console.log("stamina increased")
+            }
             return stateEditable
         
         case "damageHealth":
@@ -58,20 +63,6 @@ export const playerReducer = (previousState, instructions) => {
             }
             return stateEditable
         
-        case "modifyBlock":
-            let modifier = instructions.modifier
-            let block = stateEditable.blockChance 
-
-            if (modifier === 'minus') {
-                block -= 90
-            }
-            if (modifier === 'plus') {
-                block += 90
-            }
-
-            stateEditable.blockChance = block
-            console.log(block)
-            return stateEditable
         case "delete":
             break
         default:
