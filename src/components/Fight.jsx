@@ -16,13 +16,27 @@ export default function Fight() {
     const [crit, setCrit] = useState(false)
     const [block, setBlock] = useState(false)
     const [stance, setStance] = useState(false)
+    const [noStam, setNoStam] = useState(false)
 
     const [attackerDamageDealt, setAttackerDamageDealt] = useState()
 
+    useEffect(() => {
+        if (playerData.stamina > playerData.maxStam) {
+            playerDispatch({type:"modifyStamina", amount: playerData.stamina - playerData.maxStam, modifier: "minus"})
+        }
+    }, [playerData.stamina])
 
     function handlePlayerAttack(type) {
         // When attack button is pressed, this is triggered
         // First setting the state to allow the player attacking render to show while triggering the attack function.
+        if (playerData.stamina < 10 && (!type === 'hStance' || !type === 'nStance')) {
+            setNoStam(true)
+            setTimeout(() => {
+                setNoStam(false)
+            }, 3000)
+            return
+        }
+
         if (type === 'nStance') {
             setStance('normal stance')
             setTimeout(() => {
@@ -189,7 +203,7 @@ export default function Fight() {
                 <button onClick={() => handlePlayerAttack("hStance")}>Heavy Stance</button>
 
             </div>
-            {attackVisible && !dodged && !crit && !block && !stance &&
+            {attackVisible && !dodged && !crit && !block && !stance && !noStam &&
                 <div>
                     <p>{attacker.name} did {attackerDamageDealt} to {defender.name}</p>
                 </div>
@@ -212,6 +226,11 @@ export default function Fight() {
             {stance &&
                 <div>
                     <p>{playerData.name} uses {stance}</p>
+                </div>
+            }
+            {noStam && 
+                <div>
+                    <p>You have no stamina</p>
                 </div>
             }
         </div>
