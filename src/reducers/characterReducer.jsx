@@ -57,6 +57,21 @@ export const playerReducer = (previousState, instructions) => {
                 }
             }
             return stateEditable
+        
+        case "modifyBlock":
+            let modifier = instructions.modifier
+            let block = stateEditable.blockChance 
+
+            if (modifier === 'minus') {
+                block -= 90
+            }
+            if (modifier === 'plus') {
+                block += 90
+            }
+
+            stateEditable.blockChance = block
+            console.log(block)
+            return stateEditable
         case "delete":
             break
         default:

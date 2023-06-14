@@ -15,38 +15,54 @@ export default function Fight() {
     const [dodged, setDodged] = useState(false)
     const [crit, setCrit] = useState(false)
     const [block, setBlock] = useState(false)
+    const [stance, setStance] = useState(false)
+
+    const [attackerDamageDealt, setAttackerDamageDealt] = useState()
 
 
-    function handlePlayerAttack() {
+    function handlePlayerAttack(type) {
         // When attack button is pressed, this is triggered
         // First setting the state to allow the player attacking render to show while triggering the attack function.
-        attack(npcDispatch, npcData, playerDispatch, playerData)
-        setAttackVisible(true)
-
-        setTimeout(() => {
-            // After three seconds this function is displayed.
-            handleAttackDisplay()
-        }, 3000)
+        if (type === 'nStance') {
+            setStance('normal stance')
+            setTimeout(() => {
+                setStance(false)
+                handleNpcAttack()
+            }, 3000)
+        } else if (type === 'hStance') {
+            setStance('heavy stance')
+            playerDispatch({type:"modifyBlock", modifier:"plus"})
+            setTimeout(() => {
+                setStance(false)
+                console.log(playerData.blockChance)
+                handleNpcAttack("heavy")
+            }, 3000)
+        } else {
+            attack(npcDispatch, npcData, playerDispatch, playerData, type)
+            setAttackVisible(true)
+    
+            setTimeout(() => {
+                // After three seconds this function is displayed.
+                handleNpcAttack()
+            }, 3000)
+        }
     }
 
-    const handleAttackDisplay = () => {
-        // Immediately the visibilty is set to false to break between attacks.
+    function handleNpcAttack(stance) {
+        // Npc attack triggered
         setAttackVisible(false)
         setTimeout(() => {
-            // After one second the npc attack is triggered also setting visibility to true again.
             setAttackVisible(true)
-            handleNpcAttack()
+            attack(playerDispatch, playerData, npcDispatch, npcData, "light")
+
+            setTimeout(() => {
+                if (stance === 'heavy') {
+                    playerDispatch({type:"modifyBlock", modifier:"minus"})
+                }
+                setAttackVisible(false)
+            }, 3000)
+
         }, 1000)
-    }
-
-    function handleNpcAttack() {
-        // Npc attack triggered
-        attack(playerDispatch, playerData, npcDispatch, npcData)
-
-        setTimeout(() => {
-            // After 3 seconds, visibilty set to false again.
-            setAttackVisible(false)
-        }, 3000)
     }
 
     // function to determine if defender dodges attack
@@ -80,6 +96,7 @@ export default function Fight() {
 
     function blockChance(defender) {
         const random = Math.random() * 100
+        console.log(`${random}/${defender.blockChance}`)
         //check if random number is within defender block chance
         if (random < defender.blockChance) {
             setBlock(true)
@@ -92,7 +109,7 @@ export default function Fight() {
     }
     
 
-    function attack(defenderDispatch, defenderData, attackerDispatch, attackerData) {
+    function attack(defenderDispatch, defenderData, attackerDispatch, attackerData, type) {
         // declaring damage of attacker as variable
         let damage = attackerData.baseDamage
         let stamina = 10
@@ -101,6 +118,11 @@ export default function Fight() {
         // setting local state of defender and attacker
         setAttacker(attackerData)
         setDefender(defenderData)
+
+        if (type === 'heavy') {
+            damage *= 1.5
+            stamina *= 2
+        }
 
 
         // if dodge chance returns false, this will be run the rest of the function, else it will be returned
@@ -119,6 +141,9 @@ export default function Fight() {
         if (critChance(attackerData)) {
             damage *= 2
         }
+
+        setAttackerDamageDealt(damage)
+
 
         defenderDispatch({type:"damageHealth", amount: damage})
         attackerDispatch({type:"spendStamina", amount: stamina})
@@ -148,12 +173,15 @@ export default function Fight() {
             </div>
             }
             <div>
-                <button onClick={handlePlayerAttack}>Player Attack</button>
+                <button onClick={() => handlePlayerAttack("light")}>Light Attack</button>
+                <button onClick={() => handlePlayerAttack("heavy")}>Heavy Attack</button>
+                <button onClick={() => handlePlayerAttack("nStance")}>Normal Stance</button>
+                <button onClick={() => handlePlayerAttack("hStance")}>Heavy Stance</button>
 
             </div>
-            {attackVisible && !dodged && !crit && !block &&
+            {attackVisible && !dodged && !crit && !block && !stance &&
                 <div>
-                    <p>{attacker.name} did {attacker.baseDamage} to {defender.name}</p>
+                    <p>{attacker.name} did {attackerDamageDealt} to {defender.name}</p>
                 </div>
                 }
                 {dodged && 
@@ -169,6 +197,11 @@ export default function Fight() {
             {crit && 
                 <div> 
                     <p>{attacker.name} crit hit due to their {attacker.critChance}% critical hit chance</p>
+                </div>
+            }
+            {stance &&
+                <div>
+                    <p>{playerData.name} uses {stance}</p>
                 </div>
             }
         </div>
