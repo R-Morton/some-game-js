@@ -38,7 +38,7 @@ export default function MainMenuPage() {
         <div>
             <h1>Some Game</h1>
             <button onClick={handleToggleFight}>Fight!</button>
-            {toggleFight && <Fight />}
+            {toggleFight && <Fight toggleFight={handleToggleFight}/>}
             <button onClick={handleLeveling}>Increase Level Exp</button>
             <button onClick={handleInventory}>Inventory</button>
             {toggle && 

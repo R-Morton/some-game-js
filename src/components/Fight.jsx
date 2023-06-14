@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { usePlayerData, useNpcData, useNpcDispatch, usePlayerDispatch } from "../contexts/PlayerContext";
 
-export default function Fight() {
+export default function Fight(props) {
 
     const [attackVisible, setAttackVisible] = useState(false)
     const [attacker, setAttacker] = useState()
@@ -17,6 +17,8 @@ export default function Fight() {
     const [block, setBlock] = useState(false)
     const [stance, setStance] = useState(false)
     const [noStam, setNoStam] = useState(false)
+    const [playerDead, setPlayerDead] = useState(false)
+    const [npcDead, setNpcDead] = useState(false)
 
     const [attackerDamageDealt, setAttackerDamageDealt] = useState()
 
@@ -25,6 +27,21 @@ export default function Fight() {
             playerDispatch({type:"modifyStamina", amount: playerData.stamina - playerData.maxStam, modifier: "minus"})
         }
     }, [playerData.stamina])
+
+    useEffect(() => {
+        if (playerData.health <= 0) {
+            setPlayerDead(true)
+            setTimeout(() => {
+                props.toggleFight()
+            }, 3000)
+        }
+        else if (npcData.health <=0) {
+            setNpcDead(true)
+            setTimeout(() => {
+                props.toggleFight()
+            }, 3000)
+        }
+    }, [playerData.health, npcData.health])
 
     function handlePlayerAttack(type) {
         // When attack button is pressed, this is triggered
@@ -203,7 +220,7 @@ export default function Fight() {
                 <button onClick={() => handlePlayerAttack("hStance")}>Heavy Stance</button>
 
             </div>
-            {attackVisible && !dodged && !crit && !block && !stance && !noStam &&
+            {attackVisible && !dodged && !crit && !block && !stance && !noStam && !playerDead && !npcDead &&
                 <div>
                     <p>{attacker.name} did {attackerDamageDealt} to {defender.name}</p>
                 </div>
@@ -231,6 +248,18 @@ export default function Fight() {
             {noStam && 
                 <div>
                     <p>You have no stamina</p>
+                </div>
+            }
+
+            {playerDead &&
+                <div>
+                    <p>You died!</p>
+                </div>
+            }
+
+            {npcDead &&
+                <div>
+                    <p>You killed {npcData.name}</p>
                 </div>
             }
         </div>
