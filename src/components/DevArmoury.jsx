@@ -29,7 +29,6 @@ export default function DevArmoury() {
     }
 
     useEffect(() => {
-        console.log("this runs")
         const updatedPlayerStats = {...playerData}
         updatedPlayerStats.armourRating = 0
         Object.values(playerData.armour).forEach((piece) => {
@@ -37,9 +36,10 @@ export default function DevArmoury() {
                 updatedPlayerStats.armourRating += piece.rating
             }
         })
+        console.log(updatedPlayerStats)
         playerDispatch({type:"update", data: updatedPlayerStats})
 
-    }, [playerData.armour])
+    }, [playerData.armour.head, playerData.armour.chest, playerData.armour.legs, playerData.armour.hands, playerData.armour.feet])
     
 
     return(
