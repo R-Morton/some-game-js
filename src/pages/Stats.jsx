@@ -17,7 +17,7 @@ export default function Stats() {
                 <p>Health: {playerData.maxHealth}</p>
                 <p>Stamina: {playerData.maxStam}</p>
                 <p>Damage: {playerData.damage}</p>
-                <p>Armour: </p>
+                <p>Armour: {playerData.armourRating} </p>
             </div>
             <div>
                 <h4>Attributes</h4>

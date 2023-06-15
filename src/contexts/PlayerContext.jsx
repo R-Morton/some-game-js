@@ -61,7 +61,6 @@ export default function PlayerProvider(props) {
             updatedPlayerStats.critChance = 5 + (updatedPlayerStats.luck * 2)
             updatedPlayerStats.blockChance = 5 + (updatedPlayerStats.endurance * 3)
             updatedPlayerStats.dodgeChance = 5 + (updatedPlayerStats.agility * 3)
-        playerDispatch({type:"update", data: updatedPlayerStats})
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
