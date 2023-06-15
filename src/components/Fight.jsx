@@ -60,7 +60,7 @@ export default function Fight(props) {
 
     // When attack button is pressed, this is triggered
     function handlePlayerAttack(type) {
-        
+        console.log(npcData)
         // Checking if an attack is being made, not a stance and if stamina is below 10. If true, then trigger a no stamina display and return.
         if (playerData.stamina < 10 && (!type === 'hStance' || !type === 'nStance')) {
             setNoStam(true)

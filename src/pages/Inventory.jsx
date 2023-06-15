@@ -1,19 +1,9 @@
-import { usePlayerData, usePlayerDispatch } from "../contexts/PlayerContext"
-import { ironWeapons } from "../components/weapons/Weapons"
-import { ironArmour } from "../components/armour/Armour"
+import { usePlayerData } from "../contexts/PlayerContext"
 
 export default function Inventory() {
 
     const playerData = usePlayerData()
-    const playerDispatch = usePlayerDispatch()
 
-    function equipSword() {
-        playerDispatch({type:"equip", data: ironWeapons.longsword})
-    }
-
-    function equipArmor() {
-        playerDispatch({type:"equipArmour", data: ironArmour.chest})
-    }
 
     return (
         <div>
@@ -27,9 +17,6 @@ export default function Inventory() {
             <p>Legs: {playerData.armour.legs ? playerData.armour.legs.name : 'empty'}</p>
             <p>Hands: {playerData.armour.hands ? playerData.armour.hands.name : 'empty'}</p>
             <p>Feet: {playerData.armour.feet ? playerData.armour.feet.name : 'empty'}</p>
-            
-            <button onClick={equipSword}>Equip longsword</button>
-            <button onClick={equipArmor}>Equip Helmet</button>
         </div>
     )
 }

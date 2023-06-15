@@ -1,48 +1,7 @@
 import { createContext, useContext, useReducer, useEffect } from "react"
 import { useLocalStorage } from "react-use"
 import { playerReducer } from "../reducers/characterReducer"
-
-// Initial player data declared here. In time, player can choose name, but not yet.
-const initialPlayerData = {
-    name: "Player",
-    isInitialData: true,
-    weapon: {
-        mainHand: null,
-        offHand: null
-    },
-    armour: {
-        head: null,
-        chest: null,
-        legs: null,
-        hands: null,
-        feet: null
-    },
-    level: 1,
-    levelExp: 0,
-    levelExpMax: 100,
-    strength: 1,
-    agility: 1,
-    luck: 1,
-    endurance: 1,
-    maxHealth: null,
-    health: null,
-    maxStam: null,
-    stamina: null,
-    damage: null,
-    dodgeChance: null,
-    blockChance: null,
-    critChance: null,
-    baseDamage: 10,
-    inventory: [],
-    isPlayer: true
-}
-
-
-const initialNpcData = {...initialPlayerData, name: "NPC", isPlayer: false}
-
-
-
-
+import { initialCharacterData } from "../data/InitialCharacterData"
 
 // Contexts created here
 export const PlayerDataContext = createContext(null)
@@ -72,11 +31,11 @@ export function useNpcDispatch() {
 
 export default function PlayerProvider(props) {
 
-    const [persistantData, setPersistantData] = useLocalStorage('player', initialPlayerData)
+    const [persistantData, setPersistantData] = useLocalStorage('player', initialCharacterData)
 
     // Initialising reducers
-    const [playerData, playerDispatch] = useReducer(playerReducer, persistantData || initialPlayerData)
-    const [npcData, npcDispatch] = useReducer(playerReducer, initialNpcData)
+    const [playerData, playerDispatch] = useReducer(playerReducer, persistantData || initialCharacterData)
+    const [npcData, npcDispatch] = useReducer(playerReducer, initialCharacterData)
 
 
     useEffect(() => {
@@ -111,6 +70,8 @@ export default function PlayerProvider(props) {
     // Lets make this more DRY down the track
     useEffect(() => {
         const updatedNpcStats = {...npcData}
+        updatedNpcStats.name = "NPC"
+        updatedNpcStats.isPlayer = false
         updatedNpcStats.maxHealth = 5 + (updatedNpcStats.endurance * 10)
         updatedNpcStats.health = updatedNpcStats.maxHealth
         updatedNpcStats.maxStam = 100 + (updatedNpcStats.agility * 5)
