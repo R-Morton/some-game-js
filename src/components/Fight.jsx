@@ -8,6 +8,7 @@ export default function Fight(props) {
     const [defender, setDefender] = useState()
 
     const [playerAttack, setPlayerAttack] = useState(false)
+    const [playerStance, setPlayerStance] = useState(false)
 
     const playerData = usePlayerData()
     const playerDispatch = usePlayerDispatch()
@@ -26,7 +27,7 @@ export default function Fight(props) {
     const [attackerDamageDealt, setAttackerDamageDealt] = useState()
 
 
-
+    // Modifies the stamina value to ensure it does not go above max
     useEffect(() => {
         if (playerData.stamina > playerData.maxStam) {
             playerDispatch({type:"modifyStamina", amount: playerData.stamina - playerData.maxStam, modifier: "minus"})
@@ -34,6 +35,7 @@ export default function Fight(props) {
     // eslint-disable-next-line
     }, [playerData.stamina])
 
+    // Checks player and npc health and modifies to not display negative numbers
     useEffect(() => {
         if (playerData.health <= 0) {
             playerDispatch({type:"modifyHealth", modifier: 'plus', amount: Math.abs(playerData.health - 0)})
@@ -47,6 +49,7 @@ export default function Fight(props) {
     // eslint-disable-next-line
     }, [playerData.health, npcData.health])
 
+    // Function to exit the fight component and resets all stats and state needed.
     function exitFight() {
         setPlayerDead(false)
         setNpcDead(false)
@@ -55,10 +58,10 @@ export default function Fight(props) {
         props.toggleFight()
     }
 
+    // When attack button is pressed, this is triggered
     function handlePlayerAttack(type) {
-        // When attack button is pressed, this is triggered
-        // First setting the state to allow the player attacking render to show while triggering the attack function.
         
+        // Checking if an attack is being made, not a stance and if stamina is below 10. If true, then trigger a no stamina display and return.
         if (playerData.stamina < 10 && (!type === 'hStance' || !type === 'nStance')) {
             setNoStam(true)
             setTimeout(() => {
@@ -67,52 +70,65 @@ export default function Fight(props) {
             return
         }
 
+        // If normal stance was selected, then modify stamina and go straight to npc attack
         if (type === 'nStance') {
             setStance('normal stance')
             setTimeout(() => {
                 setStance(false)
                 playerDispatch({type:"modifyStamina", amount: 30, modifier: "plus"})
-                handleNpcAttack("normal")
+                // set stance state to normal
+                setPlayerStance("normal")
             }, 3000)
+        
+        // If heavy stance, same process as normal stance but different stat changes
         } else if (type === 'hStance') {
             setStance('heavy stance')
             setTimeout(() => {
                 setStance(false)
                 playerDispatch({type:"modifyStamina", amount: 15, modifier: "plus"})
-                handleNpcAttack("heavy")
+                // set stance state to heavy
+                setPlayerStance("heavy")
             }, 3000)
         } else {
+            
+            // No stance selected, proceed with attack
             attack(npcDispatch, npcData, playerDispatch, playerData, type)
             setAttackVisible(true)
     
             setTimeout(() => {
-                // After three seconds this function is displayed.
+                // Setting attack state to true
                 setPlayerAttack(true)
             }, 3000)
         }
     }
 
     useEffect(() => {
+        // If playerattack state is true and npc health is above 0, this will trigger, calling the npc to attack
         if(playerAttack && npcData.health > 0) {
             handleNpcAttack()
         }
     // eslint-disable-next-line
     }, [playerAttack, npcData.health])
 
-    function handleNpcAttack(stance) {
-        // Npc attack triggered
+    useEffect(() => {
+        // If player stance state is set to a value and npc health is above 0, this will trigger, calling the npc to attack
+        if (playerStance && npcData.health > 0) {
+            handleNpcAttack(playerStance)
+        }
+    // eslint-disable-next-line
+    }, [playerStance, npcData.health])
+
+    function handleNpcAttack() {
+        // Resetting player attack back to false now that the npc attack is about to be triggered
         setPlayerAttack(false)
         setAttackVisible(false)
 
-        console.log(npcDead)
-
         setTimeout(() => {
+            // After 3 seconds, the npc attack is triggered, passing the playerStance state as a variable
             setAttackVisible(true)
-            attack(playerDispatch, playerData, npcDispatch, npcData, "light", stance)
+            attack(playerDispatch, playerData, npcDispatch, npcData, "light", playerStance)
 
             setTimeout(() => {
-                if (stance === 'heavy') {
-                }
                 setAttackVisible(false)
             }, 3000)
 
@@ -124,12 +140,14 @@ export default function Fight(props) {
         // generate number between 0 and 100
         const random = Math.random() * 100
         let dodgeChance = defender.dodgeChance
+        // Checking stance value passed into the attack function and increasing dodge chance if true
         if (stance === 'normal') {
             // eslint-disable-next-line
             dodgeChance += 10
         }
-        // check if random number is within defender dodge chance
-        if (random < defender.dodgeChance) {
+        // check if random number is within defender dodge chance and return true if truthy
+        if (random < dodgeChance) {
+            setPlayerStance(false)
             setDodged(true)
             setTimeout(() => {
                 setDodged(false)
@@ -137,6 +155,7 @@ export default function Fight(props) {
             return true
         }
         // If number is higher than dodge chance, return false
+        setPlayerStance(false)
         return false
     }
 
@@ -156,30 +175,34 @@ export default function Fight(props) {
     function blockChance(defender, stance) {
         const random = Math.random() * 100
         let blockChance = defender.blockChance
+        // Similar with dodge chance function. Check if stance passed through is heavy and increase block chance if true
         if (stance === 'heavy') {
             blockChance =+ 30
         }
         //check if random number is within defender block chance
         if (random < blockChance) {
+            setPlayerStance(false)
             setBlock(true)
             setTimeout(() => {
                 setBlock(false)
             }, 3000)
             return true
         }
+        setPlayerStance(false)
         return false
     }
     
 
     function attack(defenderDispatch, defenderData, attackerDispatch, attackerData, type, stance) {
-        // declaring damage of attacker as variable
+        // declaring damage of attacker as variable and base cost of stamina to attacker
         let damage = attackerData.baseDamage
         let stamina = 10
 
-        // setting local state of defender and attacker
+        // setting local state of defender and attacker for rendering display
         setAttacker(attackerData)
         setDefender(defenderData)
 
+        // If type of attack is heavy, increase damage and stamina values
         if (type === 'heavy') {
             damage *= 1.5
             stamina *= 2
@@ -192,20 +215,21 @@ export default function Fight(props) {
             return 
         }
 
+        // If block chance returns false, then continue function
         if (blockChance(defenderData, stance)) {
             attackerDispatch({type:"modifyStamina", amount: stamina, modifier: "minus"})
             return
         }
 
-
-
+        // If critChance returns true, then double the damage
         if (critChance(attackerData)) {
             damage *= 2
         }
 
+        // Setting final damage dealt to state for displaying in render
         setAttackerDamageDealt(damage)
 
-
+        // Use dispatches to modify health and stamina of attacker and defender
         defenderDispatch({type:"modifyHealth", modifier:"minus", amount: damage})
         attackerDispatch({type:"modifyStamina", amount: stamina, modifier: 'minus'})
 
