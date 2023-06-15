@@ -7,6 +7,8 @@ export default function Fight(props) {
     const [attacker, setAttacker] = useState()
     const [defender, setDefender] = useState()
 
+    const [playerAttack, setPlayerAttack] = useState(false)
+
     const playerData = usePlayerData()
     const playerDispatch = usePlayerDispatch()
     const npcDispatch = useNpcDispatch()
@@ -17,39 +19,41 @@ export default function Fight(props) {
     const [block, setBlock] = useState(false)
     const [stance, setStance] = useState(false)
     const [noStam, setNoStam] = useState(false)
+
     const [playerDead, setPlayerDead] = useState(false)
     const [npcDead, setNpcDead] = useState(false)
 
     const [attackerDamageDealt, setAttackerDamageDealt] = useState()
 
-    useEffect(() => {
-        npcDispatch({type:"resetStats"})
-        playerDispatch({type:"resetStats"})
-        setPlayerDead(false)
-        setNpcDead(false)
-    }, [npcDispatch, playerDispatch])
+
 
     useEffect(() => {
         if (playerData.stamina > playerData.maxStam) {
             playerDispatch({type:"modifyStamina", amount: playerData.stamina - playerData.maxStam, modifier: "minus"})
         }
+    // eslint-disable-next-line
     }, [playerData.stamina])
 
     useEffect(() => {
         if (playerData.health <= 0) {
+            playerDispatch({type:"modifyHealth", modifier: 'plus', amount: Math.abs(playerData.health - 0)})
             setPlayerDead(true)
-            setTimeout(() => {
-                props.toggleFight()
-            }, 3000)
         }
 
         if (npcData.health <= 0) {
+            npcDispatch({type:"modifyHealth", modifier: 'plus', amount: Math.abs(npcData.health - 0)})
             setNpcDead(true)
-            setTimeout(() => {
-                props.toggleFight()
-            }, 3000)
         }
-    }, [playerData.health, npcData.health, props])
+    // eslint-disable-next-line
+    }, [playerData.health, npcData.health])
+
+    function exitFight() {
+        setPlayerDead(false)
+        setNpcDead(false)
+        npcDispatch({type:"resetStats"})
+        playerDispatch({type:"resetStats"})
+        props.toggleFight()
+    }
 
     function handlePlayerAttack(type) {
         // When attack button is pressed, this is triggered
@@ -83,20 +87,24 @@ export default function Fight(props) {
     
             setTimeout(() => {
                 // After three seconds this function is displayed.
-                handleNpcAttack()
+                setPlayerAttack(true)
             }, 3000)
         }
     }
 
+    useEffect(() => {
+        if(playerAttack && npcData.health > 0) {
+            handleNpcAttack()
+        }
+    // eslint-disable-next-line
+    }, [playerAttack, npcData.health])
+
     function handleNpcAttack(stance) {
         // Npc attack triggered
-
-        if (playerDead || npcDead) {
-            console.log("this ran")
-            return
-        }
-
+        setPlayerAttack(false)
         setAttackVisible(false)
+
+        console.log(npcDead)
 
         setTimeout(() => {
             setAttackVisible(true)
@@ -117,6 +125,7 @@ export default function Fight(props) {
         const random = Math.random() * 100
         let dodgeChance = defender.dodgeChance
         if (stance === 'normal') {
+            // eslint-disable-next-line
             dodgeChance += 10
         }
         // check if random number is within defender dodge chance
@@ -197,7 +206,7 @@ export default function Fight(props) {
         setAttackerDamageDealt(damage)
 
 
-        defenderDispatch({type:"damageHealth", amount: damage})
+        defenderDispatch({type:"modifyHealth", modifier:"minus", amount: damage})
         attackerDispatch({type:"modifyStamina", amount: stamina, modifier: 'minus'})
 
         return
@@ -223,10 +232,14 @@ export default function Fight(props) {
             </div>
             }
             <div>
-                <button onClick={() => handlePlayerAttack("light")}>Light Attack</button>
-                <button onClick={() => handlePlayerAttack("heavy")}>Heavy Attack</button>
-                <button onClick={() => handlePlayerAttack("nStance")}>Normal Stance</button>
-                <button onClick={() => handlePlayerAttack("hStance")}>Heavy Stance</button>
+                {(!playerDead && !npcDead) && 
+                    <div>
+                        <button onClick={() => handlePlayerAttack("light")}>Light Attack</button>
+                        <button onClick={() => handlePlayerAttack("heavy")}>Heavy Attack</button>
+                        <button onClick={() => handlePlayerAttack("nStance")}>Normal Stance</button>
+                        <button onClick={() => handlePlayerAttack("hStance")}>Heavy Stance</button>
+                    </div>}
+                {(playerDead || npcDead) && <button onClick={exitFight}>Exit fight</button>}
 
             </div>
             {attackVisible && !dodged && !crit && !block && !stance && !noStam && !playerDead && !npcDead &&

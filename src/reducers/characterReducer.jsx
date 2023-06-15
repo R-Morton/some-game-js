@@ -39,12 +39,16 @@ export const playerReducer = (previousState, instructions) => {
                 stateEditable.stamina -= instructions.amount
             } else if (instructions.modifier === 'plus') {
                 stateEditable.stamina += instructions.amount
-                console.log("stamina increased")
             }
             return stateEditable
         
-        case "damageHealth":
-            stateEditable.health -= instructions.amount
+        case "modifyHealth":
+            if (instructions.modifier === 'minus') {
+                stateEditable.health -= instructions.amount
+            }
+            else if (instructions.modifier === 'plus') {
+                stateEditable.health += instructions.amount
+            }
             return stateEditable
 
         case "resetStats":
