@@ -111,7 +111,7 @@ export default function PlayerProvider(props) {
     // Lets make this more DRY down the track
     useEffect(() => {
         const updatedNpcStats = {...npcData}
-        updatedNpcStats.maxHealth = 20 + (updatedNpcStats.endurance * 10)
+        updatedNpcStats.maxHealth = 5 + (updatedNpcStats.endurance * 10)
         updatedNpcStats.health = updatedNpcStats.maxHealth
         updatedNpcStats.maxStam = 100 + (updatedNpcStats.agility * 5)
         updatedNpcStats.stamina = updatedNpcStats.maxStam

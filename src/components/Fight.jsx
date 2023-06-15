@@ -23,6 +23,13 @@ export default function Fight(props) {
     const [attackerDamageDealt, setAttackerDamageDealt] = useState()
 
     useEffect(() => {
+        npcDispatch({type:"resetStats"})
+        playerDispatch({type:"resetStats"})
+        setPlayerDead(false)
+        setNpcDead(false)
+    }, [npcDispatch, playerDispatch])
+
+    useEffect(() => {
         if (playerData.stamina > playerData.maxStam) {
             playerDispatch({type:"modifyStamina", amount: playerData.stamina - playerData.maxStam, modifier: "minus"})
         }
@@ -35,17 +42,19 @@ export default function Fight(props) {
                 props.toggleFight()
             }, 3000)
         }
-        else if (npcData.health <=0) {
+
+        if (npcData.health <= 0) {
             setNpcDead(true)
             setTimeout(() => {
                 props.toggleFight()
             }, 3000)
         }
-    }, [playerData.health, npcData.health])
+    }, [playerData.health, npcData.health, props])
 
     function handlePlayerAttack(type) {
         // When attack button is pressed, this is triggered
         // First setting the state to allow the player attacking render to show while triggering the attack function.
+        
         if (playerData.stamina < 10 && (!type === 'hStance' || !type === 'nStance')) {
             setNoStam(true)
             setTimeout(() => {
@@ -66,7 +75,6 @@ export default function Fight(props) {
             setTimeout(() => {
                 setStance(false)
                 playerDispatch({type:"modifyStamina", amount: 15, modifier: "plus"})
-                console.log(playerData.blockChance)
                 handleNpcAttack("heavy")
             }, 3000)
         } else {
@@ -82,10 +90,16 @@ export default function Fight(props) {
 
     function handleNpcAttack(stance) {
         // Npc attack triggered
+
+        if (playerDead || npcDead) {
+            console.log("this ran")
+            return
+        }
+
         setAttackVisible(false)
+
         setTimeout(() => {
             setAttackVisible(true)
-            console.log(playerData)
             attack(playerDispatch, playerData, npcDispatch, npcData, "light", stance)
 
             setTimeout(() => {
@@ -136,8 +150,6 @@ export default function Fight(props) {
         if (stance === 'heavy') {
             blockChance =+ 30
         }
-        console.log(stance)
-        console.log(`${random}/${blockChance}`)
         //check if random number is within defender block chance
         if (random < blockChance) {
             setBlock(true)
@@ -154,7 +166,6 @@ export default function Fight(props) {
         // declaring damage of attacker as variable
         let damage = attackerData.baseDamage
         let stamina = 10
-
 
         // setting local state of defender and attacker
         setAttacker(attackerData)
@@ -188,8 +199,6 @@ export default function Fight(props) {
 
         defenderDispatch({type:"damageHealth", amount: damage})
         attackerDispatch({type:"modifyStamina", amount: stamina, modifier: 'minus'})
-
-    
 
         return
     }

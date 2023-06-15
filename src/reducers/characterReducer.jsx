@@ -46,6 +46,12 @@ export const playerReducer = (previousState, instructions) => {
         case "damageHealth":
             stateEditable.health -= instructions.amount
             return stateEditable
+
+        case "resetStats":
+            stateEditable.health = stateEditable.maxHealth 
+            stateEditable.stamina = stateEditable.maxStam 
+
+            return stateEditable
         
         case "equipWeapon":
             stateEditable.weapon.mainHand = instructions.data
