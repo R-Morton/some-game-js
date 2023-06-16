@@ -1,75 +1,73 @@
 
-export const armourSets = [
+export const lightArmourSets = [
     {
-    setName: "Iron",
     head: {
-        name: "Iron Helmet",
+        name: "Leather Helmet",
         slot: "head",
+        type: "heavy",
+        rating: 2
+    },
+
+    chest: {
+        name: "Leather Chestplate",
+        slot: "chest",
         type: "heavy",
         rating: 3
     },
 
-    chest: {
-        name: "Iron Chestplate",
-        slot: "chest",
-        type: "heavy",
-        rating: 4
-    },
-
     legs: {
-        name: "Iron Leggings",
+        name: "Leather Leggings",
         slot: "legs",
         type: "heavy",
-        rating: 4
+        rating: 2
     },
 
     feet: {
-        name: "Iron Shoes",
+        name: "Leather Boots",
         slot: "feet",
         type: "heavy",
-        rating: 2
+        rating: 1
     },
 
     hands: {
-        name: "Iron Gauntlets",
+        name: "Leather Gloves",
         slot: "hands",
         type: "heavy",
-        rating: 2
+        rating: 1
     }
 },
 
 {
-    setName: "Steel",
     head: {
-        name: "Steel Helmet",
+        name: "Sturdy Leather Helmet",
         slot: "head",
         type: "heavy",
         rating: 3
     },
 
     chest: {
-        name: "Steel Chestplate",
+        name: "Sturdy Leather Chestplate",
         slot: "chest",
         type: "heavy",
         rating: 4
     },
 
     legs: {
-        name: "Steel Leggings",
+        name: "Sturdy Leather Leggings",
         slot: "legs",
         type: "heavy",
-        rating: 4
+        rating: 3
     },
 
     feet: {
-        name: "Steel Shoes",
+        name: "Sturdy Leather Boots",
         slot: "feet",
         type: "heavy",
         rating: 2
     },
 
     hands: {
-        name: "Steel Gauntlets",
+        name: "Sturdy Leather Gloves",
         slot: "hands",
         type: "heavy",
         rating: 2

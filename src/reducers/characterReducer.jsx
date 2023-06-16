@@ -58,6 +58,21 @@ export const playerReducer = (previousState, instructions) => {
             return stateEditable
         
         case "equipWeapon":
+            let weapon = instructions.data
+            if (weapon.twoHanded) {
+                stateEditable.weapon.mainhand = instructions.data
+                stateEditable.weapon.offHand = instructions.data
+            }
+
+            else {
+                if (stateEditable.weapon.offHand?.twoHanded) {
+                    stateEditable.weapon.mainhand = instructions.data
+                    stateEditable.weapon.offHand = null
+                } else {
+                    stateEditable.weapon.mainhand = instructions.data
+                }
+            }
+
             stateEditable.weapon.mainHand = instructions.data
             return stateEditable
         
