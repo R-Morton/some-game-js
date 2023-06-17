@@ -21,12 +21,12 @@ export const initialCharacterData = {
     endurance: 1,
     blade: {
         level: 1,
-        exp: 0,
+        exp: 90,
         maxExp: 100
     },
     blunt: {
         level: 1,
-        exp: 0,
+        exp: 90,
         maxExp: 100
     },
     heavy: {

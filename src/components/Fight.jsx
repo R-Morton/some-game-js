@@ -48,6 +48,14 @@ export default function Fight(props) {
         }
     // eslint-disable-next-line
     }, [playerData.health, npcData.health])
+    
+    useEffect(() => {
+        if (playerData.blade.exp >= playerData.blade.maxExp) {
+            playerDispatch({type: "increaseWeaponSkillLevel", skill: "blade"})
+        } else if (playerData.blunt.exp >= playerData.blunt.maxExp) {
+            playerDispatch({type: "increaseWeaponSkillLevel", skill: "blunt"})
+        }
+    }, [playerData.blade.exp, playerData.blunt.exp])
 
     // Function to exit the fight component and resets all stats and state needed.
     function exitFight() {
@@ -233,7 +241,7 @@ export default function Fight(props) {
         defenderDispatch({type:"modifyHealth", modifier:"minus", amount: damage})
         attackerDispatch({type:"modifyStamina", amount: stamina, modifier: 'minus'})
         if (attackerData.isPlayer) {
-            attackerDispatch({type:"addWeaponSkill"})
+            attackerDispatch({type:"addWeaponExp"})
         }
 
         return

@@ -34,7 +34,7 @@ export const playerReducer = (previousState, instructions) => {
             console.log(stateEditable)
             return stateEditable
         
-        case "addWeaponSkill":
+        case "addWeaponExp":
             
             const updatedBladeState = {
                 ...stateEditable,
@@ -53,17 +53,44 @@ export const playerReducer = (previousState, instructions) => {
             };
 
             if (stateEditable.weapon.mainHand?.type === "blade") {
-                console.log("increasing blade skill")
                 return updatedBladeState
             } else if (stateEditable.weapon.mainHand?.type === "blunt") {
-                console.log("increasing blunt skill")
                 return updatedBluntState
             } else {
-                console.log("increasing no skill")
                 return stateEditable
             }
-            
         
+        case "increaseWeaponSkillLevel":{
+            let weaponSkill = instructions.skill
+            
+            const updatedBladeState = {
+                ...stateEditable,
+                blade: {
+                ...stateEditable.blade,
+                level: stateEditable.blade.level + 1,
+                exp: 0,
+                maxExp: stateEditable.blade.maxExp + 10
+                }
+            };
+
+            const updatedBluntState = {
+                ...stateEditable,
+                blunt: {
+                ...stateEditable.blunt,
+                level: stateEditable.blunt.level + 1,
+                exp: 0,
+                maxExp: stateEditable.blunt.maxExp + 10
+                }
+            };
+
+            if (weaponSkill === "blade") {
+                return updatedBladeState
+            } else {
+                return updatedBluntState
+            }
+
+
+        }
         case "modifyStamina":
             if (instructions.modifier === 'minus'){
                 stateEditable.stamina -= instructions.amount
