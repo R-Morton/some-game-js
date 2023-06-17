@@ -55,6 +55,7 @@ export default function Fight(props) {
         } else if (playerData.blunt.exp >= playerData.blunt.maxExp) {
             playerDispatch({type: "increaseWeaponSkillLevel", skill: "blunt"})
         }
+    // eslint-disable-next-line
     }, [playerData.blade.exp, playerData.blunt.exp])
 
     // Function to exit the fight component and resets all stats and state needed.
@@ -203,7 +204,7 @@ export default function Fight(props) {
 
     function attack(defenderDispatch, defenderData, attackerDispatch, attackerData, type, stance) {
         // declaring damage of attacker as variable and base cost of stamina to attacker
-        let damage = attackerData.baseDamage
+        let damage = attackerData.damage
         let stamina = 10
 
         // setting local state of defender and attacker for rendering display

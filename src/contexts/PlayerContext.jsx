@@ -57,7 +57,7 @@ export default function PlayerProvider(props) {
             updatedPlayerStats.health = updatedPlayerStats.maxHealth
             updatedPlayerStats.maxStam = 100 + (updatedPlayerStats.agility * 5)
             updatedPlayerStats.stamina = updatedPlayerStats.maxStam
-            updatedPlayerStats.damage = 5 + (updatedPlayerStats.strength)
+            updatedPlayerStats.damage = 5 + (updatedPlayerStats.strength) + (updatedPlayerStats.weapon.mainHand?.damage ?? 0)
             updatedPlayerStats.critChance = 5 + (updatedPlayerStats.luck * 2)
             updatedPlayerStats.blockChance = 5 + (updatedPlayerStats.endurance * 3)
             updatedPlayerStats.dodgeChance = 5 + (updatedPlayerStats.agility * 3)
@@ -76,7 +76,7 @@ export default function PlayerProvider(props) {
         updatedNpcStats.health = updatedNpcStats.maxHealth
         updatedNpcStats.maxStam = 100 + (updatedNpcStats.agility * 5)
         updatedNpcStats.stamina = updatedNpcStats.maxStam
-        updatedNpcStats.damage = 5 + (updatedNpcStats.strength)
+        updatedNpcStats.damage = 5 + (updatedNpcStats.strength) + (updatedNpcStats.weapon.mainHand?.damage ?? 0)
         updatedNpcStats.critChance = 5 + (updatedNpcStats.luck * 2)
         updatedNpcStats.blockChance = 5 + (updatedNpcStats.endurance * 3)
         updatedNpcStats.dodgeChance = 5 + (updatedNpcStats.agility * 3)

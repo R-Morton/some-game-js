@@ -54,7 +54,7 @@ export default function DevArmoury() {
 
     useEffect(() => {
         const updatedPlayerStats = {...playerData}
-        updatedPlayerStats.damage = 5 + (updatedPlayerStats.strength)
+        updatedPlayerStats.damage = 5 + (updatedPlayerStats.strength) + (updatedPlayerStats.weapon.mainHand?.damage ?? 0)
         updatedPlayerStats.armourRating = 0
         Object.values(playerData.armour).forEach((piece) => {
             if (piece != null) {
@@ -62,7 +62,7 @@ export default function DevArmoury() {
             }
         })
         playerDispatch({type:"update", data: updatedPlayerStats})
-
+    // eslint-disable-next-line
     }, [playerData.armour.head, playerData.armour.chest, playerData.armour.legs, playerData.armour.hands, playerData.armour.feet, playerData.weapon.mainHand, , playerData.weapon.offHand])
     
 

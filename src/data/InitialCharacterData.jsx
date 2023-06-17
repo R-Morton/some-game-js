@@ -47,7 +47,6 @@ export const initialCharacterData = {
     dodgeChance: null,
     blockChance: null,
     critChance: null,
-    baseDamage: 10,
     armourRating: 0,
     inventory: [],
     isPlayer: true
