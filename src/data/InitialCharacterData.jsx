@@ -19,6 +19,26 @@ export const initialCharacterData = {
     agility: 1,
     luck: 1,
     endurance: 1,
+    blade: {
+        level: 1,
+        exp: 0,
+        maxExp: 100
+    },
+    blunt: {
+        level: 1,
+        exp: 0,
+        maxExp: 100
+    },
+    heavy: {
+        level: 1,
+        exp: 0,
+        maxExp: 100
+    },
+    light: {
+        level: 1,
+        exp: 0,
+        maxExp: 100
+    },
     maxHealth: null,
     health: null,
     maxStam: null,

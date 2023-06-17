@@ -52,7 +52,6 @@ export default function PlayerProvider(props) {
 
     // Currently updates the health stat to match the max health
     useEffect(() => {
-        console.log("this")
         const updatedPlayerStats = {...playerData}
             updatedPlayerStats.maxHealth = 20 + (updatedPlayerStats.endurance * 10)
             updatedPlayerStats.health = updatedPlayerStats.maxHealth

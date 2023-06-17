@@ -232,6 +232,9 @@ export default function Fight(props) {
         // Use dispatches to modify health and stamina of attacker and defender
         defenderDispatch({type:"modifyHealth", modifier:"minus", amount: damage})
         attackerDispatch({type:"modifyStamina", amount: stamina, modifier: 'minus'})
+        if (attackerData.isPlayer) {
+            attackerDispatch({type:"addWeaponSkill"})
+        }
 
         return
     }
