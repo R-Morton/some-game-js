@@ -244,6 +244,7 @@ export default function Fight(props) {
         if (attackerData.isPlayer) {
             attackerDispatch({type:"addWeaponExp"})
         }
+        
 
         return
     }

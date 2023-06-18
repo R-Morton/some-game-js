@@ -13,14 +13,14 @@ export default function DevTools() {
         setDevArmouryDisplay(!devArmouryDisplay)
     }
 
-    function handleBladeIncrease() {
-        playerDispatch({type:"addWeaponSkill"})
+    function increaseArmourExp() {
+        playerDispatch({type: "addArmourExp"})
     }
-    
+
     return (
         <div>
             <button onClick={handleDevArmouryDisplay}>Dev Armoury</button>
-            <button onClick={handleBladeIncrease}>Increase Blade Exp</button>
+            <button onClick={increaseArmourExp}>Add Armour Exp</button>
             {devArmouryDisplay && <DevArmoury />}
         </div>
     )

@@ -34,6 +34,35 @@ export const playerReducer = (previousState, instructions) => {
             console.log(stateEditable)
             return stateEditable
         
+        case "addArmourExp":
+            let lightCount = 0
+            let heavyCount = 0
+
+            for (let armour of Object.values(stateEditable.armour)) {
+                if (armour?.type === 'heavy'){
+                    heavyCount += 1
+                } else if (armour?.type === "light") {
+                    lightCount += 1
+                }
+            }
+
+            console.log("heavy count " + heavyCount)
+            console.log("light count " + lightCount)
+
+            const updatedArmourSkillState = {
+                ...stateEditable,
+                heavy: {
+                    ...stateEditable.heavy,
+                    exp: stateEditable.heavy.exp + (heavyCount * 2)
+                },
+                light: {
+                    ...stateEditable.light,
+                    exp: stateEditable.light.exp + (lightCount * 2)
+                }
+            };
+
+            return updatedArmourSkillState
+
         case "addWeaponExp":
             
             const updatedBladeState = {
