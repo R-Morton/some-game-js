@@ -53,15 +53,45 @@ export const playerReducer = (previousState, instructions) => {
                 ...stateEditable,
                 heavy: {
                     ...stateEditable.heavy,
-                    exp: stateEditable.heavy.exp + (heavyCount * 2)
+                    exp: stateEditable.heavy.exp + (heavyCount * 4)
                 },
                 light: {
                     ...stateEditable.light,
-                    exp: stateEditable.light.exp + (lightCount * 2)
+                    exp: stateEditable.light.exp + (lightCount * 4)
                 }
             };
 
             return updatedArmourSkillState
+
+        case "increaseArmourLevel":
+            let armourSkill = instructions.skill
+            let leftOver = instructions.extra 
+
+            const updatedHeavyArmourState = {
+                ...stateEditable,
+                heavy: {
+                ...stateEditable.heavy,
+                level: stateEditable.heavy.level + 1,
+                exp: leftOver,
+                maxExp: stateEditable.heavy.maxExp + 10
+                }
+            };
+
+            const updatedLightArmourState = {
+                ...stateEditable,
+                light: {
+                ...stateEditable.light,
+                level: stateEditable.light.level + 1,
+                exp: leftOver,
+                maxExp: stateEditable.light.maxExp + 10
+                }
+            };
+
+            if (armourSkill === 'heavy') {
+                return updatedHeavyArmourState
+            } else {
+                return updatedLightArmourState
+            }
 
         case "addWeaponExp":
             
@@ -91,7 +121,8 @@ export const playerReducer = (previousState, instructions) => {
         
         case "increaseWeaponSkillLevel":{
             let weaponSkill = instructions.skill
-            
+
+            if (weaponSkill === 'blade') {
             const updatedBladeState = {
                 ...stateEditable,
                 blade: {
@@ -100,6 +131,7 @@ export const playerReducer = (previousState, instructions) => {
                 exp: 0,
                 maxExp: stateEditable.blade.maxExp + 10
                 }
+            } 
             };
 
             const updatedBluntState = {

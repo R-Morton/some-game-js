@@ -58,6 +58,17 @@ export default function Fight(props) {
     // eslint-disable-next-line
     }, [playerData.blade.exp, playerData.blunt.exp])
 
+    useEffect(() => {
+        let leftOverExp = 0
+        if (playerData.heavy.exp >= playerData.heavy.maxExp) {
+            leftOverExp = playerData.heavy.maxExp - playerData.heavy.exp
+            playerDispatch({type:"increaseArmourLevel", skill: "heavy", extra: leftOverExp})
+        } else if (playerData.light.exp >= playerData.light.maxExp) {
+            leftOverExp = playerData.light.maxExp - playerData.light.exp
+            playerDispatch({type:"increaseArmourLevel", skill: "light", extra: leftOverExp})
+        }
+    }, [playerData.heavy.exp, playerData.light.exp])
+
     // Function to exit the fight component and resets all stats and state needed.
     function exitFight() {
         setPlayerDead(false)
