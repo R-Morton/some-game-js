@@ -122,7 +122,6 @@ export const playerReducer = (previousState, instructions) => {
         case "increaseWeaponSkillLevel":{
             let weaponSkill = instructions.skill
 
-            if (weaponSkill === 'blade') {
             const updatedBladeState = {
                 ...stateEditable,
                 blade: {
@@ -130,7 +129,7 @@ export const playerReducer = (previousState, instructions) => {
                 level: stateEditable.blade.level + 1,
                 exp: 0,
                 maxExp: stateEditable.blade.maxExp + 10
-                }
+        
             } 
             };
 

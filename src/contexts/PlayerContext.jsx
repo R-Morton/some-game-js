@@ -53,9 +53,9 @@ export default function PlayerProvider(props) {
     // Currently updates the health stat to match the max health
     useEffect(() => {
         const updatedPlayerStats = {...playerData}
-            updatedPlayerStats.maxHealth = 20 + (updatedPlayerStats.endurance * 10)
+            updatedPlayerStats.maxHealth = 90 + (updatedPlayerStats.endurance * 10)
             updatedPlayerStats.health = updatedPlayerStats.maxHealth
-            updatedPlayerStats.maxStam = 100 + (updatedPlayerStats.agility * 5)
+            updatedPlayerStats.maxStam = 95 + (updatedPlayerStats.agility * 5)
             updatedPlayerStats.stamina = updatedPlayerStats.maxStam
             updatedPlayerStats.damage = 5 + (updatedPlayerStats.strength) + (updatedPlayerStats.weapon.mainHand?.damage ?? 0)
             updatedPlayerStats.critChance = 5 + (updatedPlayerStats.luck * 2)
@@ -72,9 +72,9 @@ export default function PlayerProvider(props) {
         const updatedNpcStats = {...npcData}
         updatedNpcStats.name = "NPC"
         updatedNpcStats.isPlayer = false
-        updatedNpcStats.maxHealth = 5 + (updatedNpcStats.endurance * 10)
+        updatedNpcStats.maxHealth = 10 + (updatedNpcStats.endurance * 10)
         updatedNpcStats.health = updatedNpcStats.maxHealth
-        updatedNpcStats.maxStam = 100 + (updatedNpcStats.agility * 5)
+        updatedNpcStats.maxStam = 20 + (updatedNpcStats.agility * 5)
         updatedNpcStats.stamina = updatedNpcStats.maxStam
         updatedNpcStats.damage = 5 + (updatedNpcStats.strength) + (updatedNpcStats.weapon.mainHand?.damage ?? 0)
         updatedNpcStats.critChance = 5 + (updatedNpcStats.luck * 2)

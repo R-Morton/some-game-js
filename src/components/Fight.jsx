@@ -9,6 +9,7 @@ export default function Fight(props) {
 
     const [playerAttack, setPlayerAttack] = useState(false)
     const [playerStance, setPlayerStance] = useState(false)
+    const [npcStance, setNpcStance] = useState(false)
 
     const playerData = usePlayerData()
     const playerDispatch = usePlayerDispatch()
@@ -19,7 +20,9 @@ export default function Fight(props) {
     const [crit, setCrit] = useState(false)
     const [block, setBlock] = useState(false)
     const [stance, setStance] = useState(false)
+    const [npcStanceDisplay, setNpcStanceDisplay] = useState(false)
     const [noStam, setNoStam] = useState(false)
+    const [skillDisplay, setSkillDisplay] = useState(false)
 
     const [playerDead, setPlayerDead] = useState(false)
     const [npcDead, setNpcDead] = useState(false)
@@ -51,9 +54,17 @@ export default function Fight(props) {
     
     useEffect(() => {
         if (playerData.blade.exp >= playerData.blade.maxExp) {
+            setSkillDisplay("blade")
             playerDispatch({type: "increaseWeaponSkillLevel", skill: "blade"})
+            setTimeout(() => {
+                setSkillDisplay(false)
+            }, 2000)
         } else if (playerData.blunt.exp >= playerData.blunt.maxExp) {
+            setSkillDisplay("blunt")
             playerDispatch({type: "increaseWeaponSkillLevel", skill: "blunt"})
+            setTimeout(() => {
+                setSkillDisplay(false)
+            }, 2000)
         }
     // eslint-disable-next-line
     }, [playerData.blade.exp, playerData.blunt.exp])
@@ -62,10 +73,18 @@ export default function Fight(props) {
         let leftOverExp = 0
         if (playerData.heavy.exp >= playerData.heavy.maxExp) {
             leftOverExp = playerData.heavy.maxExp - playerData.heavy.exp
+            setSkillDisplay("heavy armour")
             playerDispatch({type:"increaseArmourLevel", skill: "heavy", extra: leftOverExp})
+            setTimeout(() => {
+                setSkillDisplay(false)
+            }, 2000)
         } else if (playerData.light.exp >= playerData.light.maxExp) {
             leftOverExp = playerData.light.maxExp - playerData.light.exp
+            setSkillDisplay("light armour")
             playerDispatch({type:"increaseArmourLevel", skill: "light", extra: leftOverExp})
+            setTimeout(() => {
+                setSkillDisplay(false)
+            }, 2000)
         }
     }, [playerData.heavy.exp, playerData.light.exp])
 
@@ -112,7 +131,7 @@ export default function Fight(props) {
         } else {
             
             // No stance selected, proceed with attack
-            attack(npcDispatch, npcData, playerDispatch, playerData, type)
+            attack(npcDispatch, npcData, playerDispatch, playerData, type, npcStance)
             setAttackVisible(true)
     
             setTimeout(() => {
@@ -138,6 +157,21 @@ export default function Fight(props) {
     // eslint-disable-next-line
     }, [playerStance, npcData.health])
 
+    function triggerNpcStance(stance){
+        if (stance === 'normal') {
+            setNpcStanceDisplay('normal')
+            npcDispatch({type:"modifyStamina", amount: 15, modifier: "plus"})
+        } else if (stance === 'heavy') {
+            setNpcStanceDisplay('heavy')
+            npcDispatch({type:"modifyStamina", amount: 30, modifier: "plus"})
+        }
+
+        setTimeout(() => {
+            setNpcStanceDisplay(false)
+            return
+        }, 3000)
+    }
+
     function handleNpcAttack() {
         // Resetting player attack back to false now that the npc attack is about to be triggered
         setPlayerAttack(false)
@@ -146,7 +180,31 @@ export default function Fight(props) {
         setTimeout(() => {
             // After 3 seconds, the npc attack is triggered, passing the playerStance state as a variable
             setAttackVisible(true)
-            attack(playerDispatch, playerData, npcDispatch, npcData, "light", playerStance)
+            let random = Math.random()
+
+            // Basic AI code to determine what move the npc will do
+            // TO DO, create function for triggering each move to keep this section DRY
+            if (npcData.stamina < 10) {
+                if (random < 0.5) {
+                    triggerNpcStance('normal')
+                } else {
+                    triggerNpcStance('heavy')
+                }
+            } else if (npcData.stamina >= 10 && npcData.stamina < 20) {
+                if (random < 0.3) {
+                    attack(playerDispatch, playerData, npcDispatch, npcData, "light", playerStance)
+                } else if (random >= 0.3 && random < 0.7) {
+                    triggerNpcStance('heavy')
+                } else {
+                    triggerNpcStance('normal')
+                }
+            } else if (npcData.stamina >= 20) {
+                if (random < 0.4) {
+                    attack(playerDispatch, playerData, npcDispatch, npcData, "light", playerStance)
+                } else {
+                    attack(playerDispatch, playerData, npcDispatch, npcData, "heavy", playerStance)
+                }
+            }
 
             setTimeout(() => {
                 setAttackVisible(false)
@@ -255,6 +313,10 @@ export default function Fight(props) {
         if (attackerData.isPlayer) {
             attackerDispatch({type:"addWeaponExp"})
         }
+
+        if (defenderData.isPlayer) {
+            defenderDispatch({type:"addArmourExp"})
+        }
         
 
         return
@@ -290,7 +352,7 @@ export default function Fight(props) {
                 {(playerDead || npcDead) && <button onClick={exitFight}>Exit fight</button>}
 
             </div>
-            {attackVisible && !dodged && !crit && !block && !stance && !noStam && !playerDead && !npcDead &&
+            {attackVisible && !dodged && !crit && !block && !stance && !noStam && !playerDead && !npcDead && !skillDisplay && !npcStanceDisplay &&
                 <div>
                     <p>{attacker.name} did {attackerDamageDealt} to {defender.name}</p>
                 </div>
@@ -330,6 +392,18 @@ export default function Fight(props) {
             {npcDead &&
                 <div>
                     <p>You killed {npcData.name}</p>
+                </div>
+            }
+
+            {skillDisplay &&
+                <div>
+                    <p>Your {skillDisplay} skill has leveled up</p>
+                </div>
+            }
+
+            {npcStanceDisplay && 
+                <div>
+                    <p>{npcData.name} uses {npcStanceDisplay} stance</p>
                 </div>
             }
         </div>
